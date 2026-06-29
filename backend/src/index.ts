@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import { classifyMood } from './services/classifier.js';
 import { computeUserState } from './services/stateHeuristic.js';
 import { getRecommendations } from './services/matcher.js';
+import { fetchTMDBRecommendations } from './services/tmdbService.js';
+import { fetchLastFMTrack } from './services/lastfmService.js';
 
 dotenv.config();
 
@@ -61,23 +63,47 @@ app.post('/api/state', (req, res) => {
   }
 });
 
-// Endpoint 3: Match user-state to seed dataset recommendations
-app.post('/api/recommendations', (req, res) => {
+// Endpoint 3: Match user-state to live TMDB + Last.fm recommendations (seed-data fallback)
+app.post('/api/recommendations', async (req, res) => {
   const { userState } = req.body;
 
-  if (!userState || 
-      typeof userState.stressLevel !== 'number' || 
-      typeof userState.calmLevel !== 'number' || 
+  if (!userState ||
+      typeof userState.stressLevel !== 'number' ||
+      typeof userState.calmLevel !== 'number' ||
       typeof userState.attentionCapacity !== 'number') {
-    res.status(400).json({ 
-      error: 'Field "userState" is required and must contain stressLevel, calmLevel, and attentionCapacity numbers.' 
+    res.status(400).json({
+      error: 'Field "userState" is required and must contain stressLevel, calmLevel, and attentionCapacity numbers.'
     });
     return;
   }
 
   try {
-    const recommendations = getRecommendations(userState);
-    res.json(recommendations);
+    // Attempt live API calls in parallel
+    const [liveMedia, liveMusic] = await Promise.allSettled([
+      fetchTMDBRecommendations(userState),
+      fetchLastFMTrack(userState)
+    ]);
+
+    // Seed-data fallback for any category that fails
+    const seedFallback = getRecommendations(userState);
+
+    const tmdbResult = liveMedia.status === 'fulfilled' ? liveMedia.value : null;
+    const lastfmResult = liveMusic.status === 'fulfilled' ? liveMusic.value : null;
+
+    const movie = (tmdbResult?.movie)
+      ? { ...seedFallback.movie, title: tmdbResult.movie.title, extraInfo: tmdbResult.movie.extraInfo }
+      : seedFallback.movie;
+
+    const tv_show = (tmdbResult?.tv_show)
+      ? { ...seedFallback.tv_show, title: tmdbResult.tv_show.title, extraInfo: tmdbResult.tv_show.extraInfo }
+      : seedFallback.tv_show;
+
+    const music = lastfmResult
+      ? { ...seedFallback.music, title: lastfmResult.title, extraInfo: lastfmResult.extraInfo }
+      : seedFallback.music;
+
+    console.log(`[Recommendations] TMDB: ${tmdbResult ? 'live' : 'fallback'} | LastFM: ${lastfmResult ? 'live' : 'fallback'}`);
+    res.json({ movie, tv_show, music });
   } catch (error: any) {
     res.status(500).json({ error: error.message || 'Error getting recommendations' });
   }

@@ -320,6 +320,21 @@ export default function App() {
     return <span className="symbol-neutral">Neutral</span>;
   };
 
+  // Humanise raw model label into a readable mood name
+  const formatMood = (rawMood: string): string => {
+    const map: Record<string, string> = {
+      sadness: 'Sadness',
+      joy: 'Joy',
+      fear: 'Stress / Anxiety',
+      anger: 'Frustration',
+      surprise: 'Surprise',
+      disgust: 'Discomfort',
+      excitement: 'Excitement',
+      neutral: 'Neutral'
+    };
+    return map[rawMood.toLowerCase()] ?? rawMood.charAt(0).toUpperCase() + rawMood.slice(1);
+  };
+
   return (
     <div className={`app-container ${isFocusMode ? 'focus-mode-active' : ''}`}>
       {/* Cinematic Background Ambient Elements */}
@@ -451,8 +466,11 @@ export default function App() {
                 {driftStep === 'support' && (
                   <div className="slide-content text-center">
                     <h1 className="title-accent-violet">A Gentle Space</h1>
+                    <div className="mood-detected-pill" style={{ marginBottom: '16px' }}>
+                      Detected: <strong>{formatMood(mood)}</strong>
+                    </div>
                     <p className="subtitle" style={{ maxWidth: '500px', margin: '0 auto 24px auto', lineHeight: '1.6' }}>
-                      I am so sorry you are experiencing this. Grief and heavy moments take a significant toll on our minds. 
+                      I am so sorry you are experiencing this. Grief and heavy moments take a significant toll on our minds.
                       Please remember to be kind to yourself right now.
                     </p>
 
@@ -632,7 +650,14 @@ export default function App() {
                 {/* STEP 4: Results Display */}
                 {driftStep === 'results' && userState && recommendations && (
                   <div className="slide-content">
-                    <h1 className="title-accent-green" style={{ fontSize: '2.25rem', marginBottom: '24px' }}>Your Recommendations</h1>
+                    <div className="results-header">
+                      <h1 className="title-accent-green" style={{ fontSize: '2.25rem', marginBottom: '8px' }}>
+                        {mood === 'joy' || mood === 'excitement' ? 'Ready to engage?' : 'Comfort picked for you'}
+                      </h1>
+                      <div className="mood-detected-pill">
+                        Detected mood: <strong>{formatMood(mood)}</strong>
+                      </div>
+                    </div>
                     
                     {/* Inferred User State Indicator Panel */}
                     <div className="state-panel">
@@ -941,7 +966,7 @@ export default function App() {
                 <div className="wellness-article">
                   <h2>Hick's Law & Choice Fatigue</h2>
                   <p>
-                    Hick’s Law describes the time it takes for a human to make a decision as a result of the possible choices presented. Modern streaming services violate this by displaying infinite rows of recommendations, draining your cognitive resources before you even press play. Drift addresses this by limiting choices to a maximum of 3 direct options matching your current state.
+                    Hick's Law describes the time it takes for a human to make a decision as a result of the possible choices presented. Modern streaming services violate this by displaying infinite rows of recommendations, draining your cognitive resources before you even press play. Drift addresses this by limiting choices to a maximum of 3 direct options matching your current state.
                   </p>
                 </div>
 
@@ -956,6 +981,20 @@ export default function App() {
                   <h2>The Zeigarnik Effect</h2>
                   <p>
                     Psychologist Bluma Zeigarnik noticed that servers in restaurants remembered complex orders only while they were unpaid. Once paid, they forgot them. Uncompleted tasks create mental tabs that stay open in your subconscious. Focus Mode shuts down this background clutter so your brain can process the present moment.
+                  </p>
+                </div>
+
+                <div className="wellness-article">
+                  <h2>The Peak-End Rule</h2>
+                  <p>
+                    Psychologist Daniel Kahneman found that people judge an experience almost entirely by how it felt at its peak and at its end — not by the average of every moment. This is why Drift places the most weight on the first and last interaction in every session: the mood input, and the recommendation reveal. A well-timed, satisfying result at the end of the flow leaves a stronger positive memory than a technically smooth middle.
+                  </p>
+                </div>
+
+                <div className="wellness-article">
+                  <h2>Attentional Restoration Theory</h2>
+                  <p>
+                    Rachel and Stephen Kaplan proposed that the human mind has two modes of attention: directed (effortful, used for work) and involuntary (effortless, triggered by natural scenes and gentle stimuli). Directed attention fatigues over time and needs deliberate restoration. The Focus Space breathing guide and nature-documentary recommendations in Drift are specifically designed to activate involuntary attention, giving your directed attention the recovery time it needs.
                   </p>
                 </div>
               </div>

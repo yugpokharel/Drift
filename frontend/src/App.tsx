@@ -24,7 +24,7 @@ interface Recommendations {
 }
 
 type Tab = 'drift' | 'focus' | 'habits' | 'profile' | 'about';
-type DriftStep = 'mood' | 'auth-prompt' | 'time' | 'energy' | 'results';
+type DriftStep = 'mood' | 'auth-prompt' | 'support' | 'time' | 'energy' | 'results';
 type AuthStep = 'login' | 'signup' | 'forgot' | 'dashboard';
 type BreathState = 'idle' | 'inhale' | 'hold' | 'exhale';
 
@@ -161,8 +161,16 @@ export default function App() {
       const data = await response.json();
       setMood(data.mood);
 
-      // If user isn't logged in, ask if they want to log in to save their data before continuing.
-      if (!isLoggedIn) {
+      // Check for sensitive or heavy grief keywords
+      const HEAVY_KEYWORDS = [
+        'died', 'death', 'lost', 'passed away', 'funeral', 'kill', 'suicide', 
+        'depressed', 'grief', 'crying', 'broken', 'divorce', 'mourning', 'cancer', 'sick', 'accident'
+      ];
+      const isHeavy = HEAVY_KEYWORDS.some(word => text.toLowerCase().includes(word)) || data.mood === 'sadness';
+
+      if (isHeavy) {
+        setDriftStep('support');
+      } else if (!isLoggedIn) {
         setDriftStep('auth-prompt');
       } else {
         setDriftStep('time');
@@ -436,6 +444,58 @@ export default function App() {
                     >
                       Continue
                     </button>
+                  </div>
+                )}
+
+                {/* STEP 1.7: Support Grief Prompt */}
+                {driftStep === 'support' && (
+                  <div className="slide-content text-center">
+                    <h1 className="title-accent-violet">A Gentle Space</h1>
+                    <p className="subtitle" style={{ maxWidth: '500px', margin: '0 auto 24px auto', lineHeight: '1.6' }}>
+                      I am so sorry you are experiencing this. Grief and heavy moments take a significant toll on our minds. 
+                      Please remember to be kind to yourself right now.
+                    </p>
+
+                    <div className="button-group-vertical" style={{ gap: '12px' }}>
+                      <button
+                        onClick={() => {
+                          setTimeAvailable('short');
+                          handleEnergySelect('low');
+                        }}
+                        className="action-button"
+                      >
+                        View Gentle Comfort Suggestions
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setActiveTab('focus');
+                          handleBreathingStart();
+                        }}
+                        className="secondary-button"
+                      >
+                        Take a Slow Breathing Break
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setActiveTab('focus');
+                          setIsFocusMode(true);
+                          setIsFocusRunning(true);
+                        }}
+                        className="secondary-button"
+                      >
+                        Mute Clutter (Silent Focus Space)
+                      </button>
+
+                      <button
+                        onClick={() => setDriftStep('time')}
+                        className="secondary-button"
+                        style={{ borderColor: 'transparent', color: 'var(--text-muted)', fontSize: '0.82rem', textDecoration: 'underline' }}
+                      >
+                        Continue Standard Assessment
+                      </button>
+                    </div>
                   </div>
                 )}
 

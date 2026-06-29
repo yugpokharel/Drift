@@ -96,8 +96,7 @@ export default function App() {
       return;
     }
     if (supportCountdown <= 0) {
-      setTimeAvailable('short');
-      handleEnergySelect('low');
+      handleGriefAutoLoad();
       return;
     }
     const t = setTimeout(() => setSupportCountdown((c) => c - 1), 1000);
@@ -248,6 +247,45 @@ export default function App() {
       setTimeout(() => {
         triggerLoadingWithFact(false);
       }, 1500);
+    }
+  };
+
+  // Grief auto-load: passes time + energy directly to avoid stale React state
+  const handleGriefAutoLoad = async () => {
+    const selectedTime = 'short';
+    const selectedEnergy = 'low';
+    setTimeAvailable(selectedTime);
+    setEnergyLevel(selectedEnergy);
+    triggerLoadingWithFact(true);
+    setError(null);
+    try {
+      const stateResponse = await fetch(`${API_BASE}/state`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mood,
+          timeAvailable: selectedTime,
+          energyLevel: selectedEnergy,
+          hour: new Date().getHours()
+        })
+      });
+      if (!stateResponse.ok) throw new Error('Failed to compute user state.');
+      const stateData: UserState = await stateResponse.json();
+      setUserState(stateData);
+
+      const recsResponse = await fetch(`${API_BASE}/recommendations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userState: stateData })
+      });
+      if (!recsResponse.ok) throw new Error('Failed to retrieve recommendations.');
+      const recsData: Recommendations = await recsResponse.json();
+      setRecommendations(recsData);
+      setDriftStep('results');
+    } catch (err: any) {
+      setError(err.message || 'An error occurred.');
+    } finally {
+      setTimeout(() => triggerLoadingWithFact(false), 1500);
     }
   };
 

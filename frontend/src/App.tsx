@@ -81,10 +81,28 @@ export default function App() {
   const [breathState, setBreathState] = useState<BreathState>('idle');
   const [breathSeconds, setBreathSeconds] = useState(4);
 
+  // Grief support auto-advance countdown (3 seconds)
+  const [supportCountdown, setSupportCountdown] = useState(3);
+
   // Set initial random wellness fact
   useEffect(() => {
     setCurrentFact(WELLNESS_FACTS[Math.floor(Math.random() * WELLNESS_FACTS.length)]);
   }, [isLoading]);
+
+  // Auto-advance from grief support screen after 3s — no choices presented
+  useEffect(() => {
+    if (driftStep !== 'support') {
+      setSupportCountdown(3);
+      return;
+    }
+    if (supportCountdown <= 0) {
+      setTimeAvailable('short');
+      handleEnergySelect('low');
+      return;
+    }
+    const t = setTimeout(() => setSupportCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [driftStep, supportCountdown]);
 
   // Focus mode countdown timer
   useEffect(() => {
@@ -462,58 +480,23 @@ export default function App() {
                   </div>
                 )}
 
-                {/* STEP 1.7: Support Grief Prompt */}
+                {/* STEP 1.7: Grief Support — zero choices, auto-advance */}
                 {driftStep === 'support' && (
-                  <div className="slide-content text-center">
-                    <h1 className="title-accent-violet">A Gentle Space</h1>
-                    <div className="mood-detected-pill" style={{ marginBottom: '16px' }}>
-                      Detected: <strong>{formatMood(mood)}</strong>
-                    </div>
-                    <p className="subtitle" style={{ maxWidth: '500px', margin: '0 auto 24px auto', lineHeight: '1.6' }}>
-                      I am so sorry you are experiencing this. Grief and heavy moments take a significant toll on our minds.
-                      Please remember to be kind to yourself right now.
+                  <div className="slide-content text-center grief-space">
+                    <h1 className="title-accent-violet" style={{ fontSize: '2rem', marginBottom: '12px' }}>
+                      Take a breath.
+                    </h1>
+                    <p className="grief-message">
+                      I hear you. That sounds really hard.<br />
+                      I am finding something gentle for you right now.
                     </p>
-
-                    <div className="button-group-vertical" style={{ gap: '12px' }}>
-                      <button
-                        onClick={() => {
-                          setTimeAvailable('short');
-                          handleEnergySelect('low');
-                        }}
-                        className="action-button"
-                      >
-                        View Gentle Comfort Suggestions
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          setActiveTab('focus');
-                          handleBreathingStart();
-                        }}
-                        className="secondary-button"
-                      >
-                        Take a Slow Breathing Break
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          setActiveTab('focus');
-                          setIsFocusMode(true);
-                          setIsFocusRunning(true);
-                        }}
-                        className="secondary-button"
-                      >
-                        Mute Clutter (Silent Focus Space)
-                      </button>
-
-                      <button
-                        onClick={() => setDriftStep('time')}
-                        className="secondary-button"
-                        style={{ borderColor: 'transparent', color: 'var(--text-muted)', fontSize: '0.82rem', textDecoration: 'underline' }}
-                      >
-                        Continue Standard Assessment
-                      </button>
+                    <div className="grief-countdown-bar">
+                      <div
+                        className="grief-countdown-fill"
+                        style={{ width: `${((3 - supportCountdown) / 3) * 100}%` }}
+                      />
                     </div>
+                    <p className="grief-hint">Loading your comfort space{'.'.repeat(3 - supportCountdown + 1)}</p>
                   </div>
                 )}
 

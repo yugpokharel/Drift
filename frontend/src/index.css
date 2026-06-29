@@ -1594,6 +1594,50 @@ body {
   line-height: 1.72;
 }
 
+/* Grief / Heavy Emotion Auto-Advance Screen */
+.grief-space {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 48px 24px;
+}
+
+.grief-message {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  text-align: center;
+  max-width: 420px;
+  font-weight: 400;
+}
+
+.grief-countdown-bar {
+  width: 100%;
+  max-width: 320px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.grief-countdown-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--deep-violet), rgba(139, 92, 246, 0.4));
+  border-radius: 999px;
+  transition: width 0.9s ease-out;
+}
+
+.grief-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  font-style: italic;
+}
+
+
 
 
 

@@ -525,7 +525,7 @@ export default function App() {
       {/* Global Frosted Navbar */}
       <nav className="site-nav">
         <div className="nav-inner">
-          <span className="nav-wordmark">drift</span>
+          <span className="nav-wordmark">Antigravity <span>Agent</span></span>
           <div className="nav-links">
             <a href="#how" className="nav-link" onClick={(e) => e.preventDefault()}>How it works</a>
             <a href="#github" className="nav-link" onClick={(e) => e.preventDefault()}>GitHub</a>
@@ -578,190 +578,205 @@ export default function App() {
               {driftStep !== 'results' ? (
                 /* SCREEN 1: Onboarding Viewport */
                 <div className="screen-one">
-                  
-                  {/* Hero Section */}
-                  {driftStep !== 'support' && driftStep !== 'auth-prompt' && (
-                    <div className="hero-section fade-up">
-                      <h1 className="hero-headline">what can your brain actually handle right now?</h1>
-                      <p className="hero-subline">not what you like. what you can take on tonight.</p>
-                      
-                      <div className="hero-quote">
-                        <p className="hero-quote-text">
-                          “Attention is the taking possession by the mind, in clear and vivid form, of one out of several possible objects.”
-                        </p>
-                        <div className="hero-quote-attr">WILLIAM JAMES, 1890</div>
+                  <div className={`onboarding-grid ${driftStep === 'support' || driftStep === 'auth-prompt' ? 'grid-centered' : ''}`}>
+                    
+                    {/* Left Column: Hero Editorial Info */}
+                    {driftStep !== 'support' && driftStep !== 'auth-prompt' && (
+                      <div className="onboarding-left fade-up">
+                        <div className="hero-section">
+                          <h1 className="hero-headline">what can your brain actually handle right now?</h1>
+                          <p className="hero-subline">not what you like. what you can take on tonight.</p>
+                          
+                          <div className="hero-quote">
+                            <p className="hero-quote-text">
+                              “Attention is the taking possession by the mind, in clear and vivid form, of one out of several possible objects.”
+                            </p>
+                            <div className="hero-quote-attr">WILLIAM JAMES, 1890</div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Right Column: Input & Wizard Card */}
+                    <div className="onboarding-right">
+                      {/* Floating weightless orb graphics */}
+                      {driftStep !== 'support' && driftStep !== 'auth-prompt' && (
+                        <div className="cosmic-orb-graphic">
+                          <div className="orb-ring orb-ring-1"></div>
+                          <div className="orb-ring orb-ring-2"></div>
+                          <div className="orb-core"></div>
+                        </div>
+                      )}
+
+                      <div className="input-section fade-in">
+                        {/* Step Progress Bar (Labeled Steps with Connector Line) */}
+                        {renderStepProgress()}
+
+                        <div className="step-content-wrapper">
+                          {/* Step 1: Mood */}
+                          {driftStep === 'mood' && (
+                            <div className="step-slide fade-up">
+                              <div className="prompt-box-card">
+                                <textarea
+                                  value={text}
+                                  onChange={(e) => setText(e.target.value)}
+                                  placeholder="how's it going, really"
+                                  className="mood-textarea"
+                                  maxLength={500}
+                                />
+                                <div className="prompt-box-footer">
+                                  <span className="hint-text">no thinking required</span>
+                                  <button
+                                    onClick={handleMoodSubmit}
+                                    disabled={!text.trim()}
+                                    className="send-btn"
+                                    aria-label="Send mood input"
+                                  >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                      <line x1="22" y1="2" x2="11" y2="13"></line>
+                                      <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                    </svg>
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div className="suggestions-row">
+                                {suggestions.map((s, idx) => (
+                                  <button
+                                    key={idx}
+                                    onClick={() => handleSuggestionClick(s.text, idx)}
+                                    className={`suggestion-pill ${activePillIdx === idx ? 'pill-active' : ''}`}
+                                    type="button"
+                                  >
+                                    {s.label}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Grief Support */}
+                          {driftStep === 'support' && (
+                            <div className="step-slide fade-up grief-space">
+                              <h1 className="title-accent-violet" style={{ fontSize: '2rem', marginBottom: '12px' }}>
+                                Take a breath.
+                              </h1>
+                              <p className="grief-message">
+                                I hear you. That sounds really hard.<br />
+                                I am finding something gentle for you right now.
+                              </p>
+                              <div className="grief-countdown-bar">
+                                <div
+                                  className="grief-countdown-fill"
+                                  style={{ width: `${((3 - supportCountdown) / 3) * 100}%` }}
+                                />
+                              </div>
+                              <p className="grief-hint">Loading your comfort space{'.'.repeat(3 - supportCountdown + 1)}</p>
+                            </div>
+                          )}
+
+                          {/* Auth Prompt */}
+                          {driftStep === 'auth-prompt' && (
+                            <div className="step-slide fade-up text-center auth-prompt-card">
+                              <h1 className="title-accent-green">Track Your State</h1>
+                              <p className="subtitle">Would you like to log in to save your cognitive snapshots over time?</p>
+                              <div className="button-group-vertical">
+                                <button
+                                  onClick={() => {
+                                    setAuthStep('login');
+                                    setDriftStep('time');
+                                  }}
+                                  className="action-button"
+                                >
+                                  Sign In / Create Account
+                                </button>
+                                <button
+                                  onClick={() => setDriftStep('time')}
+                                  className="secondary-button"
+                                >
+                                  Continue as Guest
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Step 2: Time Available */}
+                          {driftStep === 'time' && (
+                            <div className="step-slide fade-up">
+                              <h2 className="step-question">how much time do you have to spare?</h2>
+                              <div className="step-grid">
+                                <div
+                                  className={`choice-card ${timeAvailable === 'short' ? 'selected' : ''}`}
+                                  onClick={() => {
+                                    setTimeAvailable('short');
+                                    setDriftStep('energy');
+                                  }}
+                                >
+                                  <div className="choice-title">A few minutes</div>
+                                  <div className="choice-desc">Under 30 mins</div>
+                                </div>
+
+                                <div
+                                  className={`choice-card ${timeAvailable === 'medium' ? 'selected' : ''}`}
+                                  onClick={() => {
+                                    setTimeAvailable('medium');
+                                    setDriftStep('energy');
+                                  }}
+                                >
+                                  <div className="choice-title">An episode or two</div>
+                                  <div className="choice-desc">30 to 90 mins</div>
+                                </div>
+
+                                <div
+                                  className={`choice-card ${timeAvailable === 'long' ? 'selected' : ''}`}
+                                  onClick={() => {
+                                    setTimeAvailable('long');
+                                    setDriftStep('energy');
+                                  }}
+                                >
+                                  <div className="choice-title">The whole evening</div>
+                                  <div className="choice-desc">Several hours</div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Step 3: Energy Level */}
+                          {driftStep === 'energy' && (
+                            <div className="step-slide fade-up">
+                              <h2 className="step-question">what is your cognitive energy like?</h2>
+                              <div className="step-grid">
+                                <div
+                                  className={`choice-card ${energyLevel === 'low' ? 'selected' : ''}`}
+                                  onClick={() => handleEnergySelect('low')}
+                                >
+                                  <div className="choice-title">Basically none</div>
+                                  <div className="choice-desc">Exhausted, resting</div>
+                                </div>
+
+                                <div
+                                  className={`choice-card ${energyLevel === 'mid' ? 'selected' : ''}`}
+                                  onClick={() => handleEnergySelect('mid')}
+                                >
+                                  <div className="choice-title">Some</div>
+                                  <div className="choice-desc">Typical attention</div>
+                                </div>
+
+                                <div
+                                  className={`choice-card ${energyLevel === 'high' ? 'selected' : ''}`}
+                                  onClick={() => handleEnergySelect('high')}
+                                >
+                                  <div className="choice-title">Plenty</div>
+                                  <div className="choice-desc">Focused, energetic</div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  )}
 
-                  {/* Input & Form Area */}
-                  <div className="input-section fade-in">
-                    {/* Step Progress Bar (Labeled Steps with Connector Line) */}
-                    {renderStepProgress()}
-
-                    <div className="step-content-wrapper">
-                      {/* Step 1: Mood */}
-                      {driftStep === 'mood' && (
-                        <div className="step-slide fade-up">
-                          <div className="prompt-box-card">
-                            <textarea
-                              value={text}
-                              onChange={(e) => setText(e.target.value)}
-                              placeholder="how's it going, really"
-                              className="mood-textarea"
-                              maxLength={500}
-                            />
-                            <div className="prompt-box-footer">
-                              <span className="hint-text">no thinking required</span>
-                              <button
-                                onClick={handleMoodSubmit}
-                                disabled={!text.trim()}
-                                className="send-btn"
-                                aria-label="Send mood input"
-                              >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                  <line x1="22" y1="2" x2="11" y2="13"></line>
-                                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-
-                          <div className="suggestions-row">
-                            {suggestions.map((s, idx) => (
-                              <button
-                                key={idx}
-                                onClick={() => handleSuggestionClick(s.text, idx)}
-                                className={`suggestion-pill ${activePillIdx === idx ? 'pill-active' : ''}`}
-                                type="button"
-                              >
-                                {s.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Grief Support */}
-                      {driftStep === 'support' && (
-                        <div className="step-slide fade-up grief-space">
-                          <h1 className="title-accent-violet" style={{ fontSize: '2rem', marginBottom: '12px' }}>
-                            Take a breath.
-                          </h1>
-                          <p className="grief-message">
-                            I hear you. That sounds really hard.<br />
-                            I am finding something gentle for you right now.
-                          </p>
-                          <div className="grief-countdown-bar">
-                            <div
-                              className="grief-countdown-fill"
-                              style={{ width: `${((3 - supportCountdown) / 3) * 100}%` }}
-                            />
-                          </div>
-                          <p className="grief-hint">Loading your comfort space{'.'.repeat(3 - supportCountdown + 1)}</p>
-                        </div>
-                      )}
-
-                      {/* Auth Prompt */}
-                      {driftStep === 'auth-prompt' && (
-                        <div className="step-slide fade-up text-center auth-prompt-card">
-                          <h1 className="title-accent-green">Track Your State</h1>
-                          <p className="subtitle">Would you like to log in to save your cognitive snapshots over time?</p>
-                          <div className="button-group-vertical">
-                            <button
-                              onClick={() => {
-                                setAuthStep('login');
-                                setDriftStep('time');
-                              }}
-                              className="action-button"
-                            >
-                              Sign In / Create Account
-                            </button>
-                            <button
-                              onClick={() => setDriftStep('time')}
-                              className="secondary-button"
-                            >
-                              Continue as Guest
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Step 2: Time Available */}
-                      {driftStep === 'time' && (
-                        <div className="step-slide fade-up">
-                          <h2 className="step-question">how much time do you have to spare?</h2>
-                          <div className="step-grid">
-                            <div
-                              className={`choice-card ${timeAvailable === 'short' ? 'selected' : ''}`}
-                              onClick={() => {
-                                setTimeAvailable('short');
-                                setDriftStep('energy');
-                              }}
-                            >
-                              <div className="choice-title">A few minutes</div>
-                              <div className="choice-desc">Under 30 mins</div>
-                            </div>
-
-                            <div
-                              className={`choice-card ${timeAvailable === 'medium' ? 'selected' : ''}`}
-                              onClick={() => {
-                                setTimeAvailable('medium');
-                                setDriftStep('energy');
-                              }}
-                            >
-                              <div className="choice-title">An episode or two</div>
-                              <div className="choice-desc">30 to 90 mins</div>
-                            </div>
-
-                            <div
-                              className={`choice-card ${timeAvailable === 'long' ? 'selected' : ''}`}
-                              onClick={() => {
-                                setTimeAvailable('long');
-                                setDriftStep('energy');
-                              }}
-                            >
-                              <div className="choice-title">The whole evening</div>
-                              <div className="choice-desc">Several hours</div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Step 3: Energy Level */}
-                      {driftStep === 'energy' && (
-                        <div className="step-slide fade-up">
-                          <h2 className="step-question">what is your cognitive energy like?</h2>
-                          <div className="step-grid">
-                            <div
-                              className={`choice-card ${energyLevel === 'low' ? 'selected' : ''}`}
-                              onClick={() => handleEnergySelect('low')}
-                            >
-                              <div className="choice-title">Basically none</div>
-                              <div className="choice-desc">Exhausted, resting</div>
-                            </div>
-
-                            <div
-                              className={`choice-card ${energyLevel === 'mid' ? 'selected' : ''}`}
-                              onClick={() => handleEnergySelect('mid')}
-                            >
-                              <div className="choice-title">Some</div>
-                              <div className="choice-desc">Typical attention</div>
-                            </div>
-
-                            <div
-                              className={`choice-card ${energyLevel === 'high' ? 'selected' : ''}`}
-                              onClick={() => handleEnergySelect('high')}
-                            >
-                              <div className="choice-title">Plenty</div>
-                              <div className="choice-desc">Focused, energetic</div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
                   </div>
-
                 </div>
               ) : (
                 /* SCREEN 2: Results Display */
@@ -893,7 +908,7 @@ export default function App() {
         {driftStep !== 'results' && !isLoading && (
           <footer className="site-footer">
             <div className="footer-inner">
-              <span className="footer-text">drift · final year project · 2025</span>
+              <span className="footer-text">Antigravity Agent · 2026</span>
               <span className="footer-text">built with Node.js + Express</span>
             </div>
           </footer>

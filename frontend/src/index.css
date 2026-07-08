@@ -75,12 +75,12 @@ body {
 }
 
 .glow-1 {
-  width: 600px;
-  height: 600px;
+  width: 700px;
+  height: 700px;
   top: -200px;
   left: -180px;
-  background: radial-gradient(circle, #5FE018 0%, #2A6B08 50%, transparent 70%);
-  opacity: 0.45;
+  background: radial-gradient(circle, #7FFF2E 0%, #2A6B08 50%, transparent 70%);
+  opacity: 0.6;
   animation: drift-a 24s ease-in-out infinite;
 }
 
@@ -89,8 +89,8 @@ body {
   height: 560px;
   bottom: -220px;
   right: -160px;
-  background: radial-gradient(circle, #6B3FCC 0%, #3B1F80 50%, transparent 70%);
-  opacity: 0.45;
+  background: radial-gradient(circle, #8B55F0 0%, #3B1F80 50%, transparent 70%);
+  opacity: 0.55;
   animation: drift-b 28s ease-in-out infinite;
 }
 
@@ -99,8 +99,8 @@ body {
   height: 380px;
   top: 38%;
   right: 6%;
-  background: radial-gradient(circle, #4AD018 0%, #1E5C0A 50%, transparent 70%);
-  opacity: 0.22;
+  background: radial-gradient(circle, #7FFF2E 0%, #1E5C0A 50%, transparent 70%);
+  opacity: 0.3;
   animation: drift-c 32s ease-in-out infinite;
 }
 
@@ -408,8 +408,8 @@ body {
   gap: 64px;
   align-items: center;
   width: 100%;
-  min-height: calc(100vh - var(--navbar-h) - 52px);
-  padding: 48px 0;
+  min-height: calc(100vh - var(--navbar-h));
+  padding: 0;
 }
 
 .onboarding-left {
@@ -430,7 +430,8 @@ body {
   grid-template-columns: 1fr;
   max-width: 580px;
   margin: 0 auto;
-  min-height: calc(100vh - var(--navbar-h) - 100px);
+  min-height: calc(100vh - var(--navbar-h));
+  align-content: center;
 }
 
 .onboarding-grid.grid-centered .onboarding-left {
@@ -445,7 +446,7 @@ body {
   .onboarding-grid {
     grid-template-columns: 1fr;
     gap: 48px;
-    padding: 36px 0;
+    padding: 40px 0;
   }
   .onboarding-left {
     order: 1;
@@ -468,7 +469,7 @@ body {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-lo);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .hero-headline {
@@ -478,7 +479,7 @@ body {
   font-size: clamp(36px, 4.5vw, 54px);
   line-height: 1.12;
   color: var(--text-hi);
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .hero-subline {
@@ -486,7 +487,7 @@ body {
   font-size: 17px;
   color: var(--text-mid);
   line-height: 1.55;
-  margin-bottom: 40px;
+  margin-bottom: 36px;
   max-width: 380px;
 }
 
@@ -494,14 +495,14 @@ body {
   border: none;
   border-top: 1px solid var(--border);
   width: 48px;
-  margin-bottom: 32px;
+  margin-bottom: 30px;
 }
 
 .hero-quote {
   display: flex;
   flex-direction: column;
   max-width: 340px;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .hero-quote-text {
@@ -517,7 +518,6 @@ body {
 .hero-quote-attr {
   font-size: 11.5px;
   letter-spacing: 0.07em;
-  text-transform: uppercase;
   color: var(--text-lo);
 }
 
@@ -553,6 +553,7 @@ body {
 .step-progress {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 0;
   margin-bottom: 28px;
 }
@@ -564,9 +565,10 @@ body {
 }
 
 .step-progress-connector {
-  flex: 1;
+  width: 40px;
+  flex: none;
   height: 1px;
-  background: var(--border);
+  background: rgba(255, 255, 255, 0.12);
   margin: 0 16px;
   margin-top: -14px;
 }
@@ -623,10 +625,11 @@ body {
 /* STEP 1 — Mood input container card */
 .prompt-box-card {
   width: 100%;
+  min-height: 200px;
   background: rgba(14, 18, 10, 0.75);
   border: 1px solid var(--border-green);
   border-radius: 20px;
-  padding: 26px 28px;
+  padding: 28px 30px;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   display: flex;
@@ -650,7 +653,7 @@ body {
 
 .mood-textarea {
   width: 100%;
-  min-height: 80px;
+  min-height: 100px;
   max-height: 180px;
   background: transparent;
   border: none;
@@ -714,15 +717,17 @@ body {
 }
 
 .suggestion-pill {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 100px;
-  padding: 8px 16px;
+  padding: 7px 14px;
   font-family: var(--font-body);
   font-size: 13px;
-  color: var(--text-mid);
+  font-weight: 400;
+  color: #8FA67A;
   cursor: pointer;
   outline: none;
+  text-transform: lowercase;
   transition: all 0.2s ease;
 }
 

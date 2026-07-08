@@ -590,9 +590,9 @@ export default function App() {
                           <hr className="hero-divider" />
                           <div className="hero-quote">
                             <p className="hero-quote-text">
-                              “Attention is the taking possession by the mind, in clear and vivid form, of one out of several possible objects.”
+                              "The greater the number of choices, the greater the suffering induced by trying to choose."
                             </p>
-                            <div className="hero-quote-attr">William James, 1890</div>
+                            <div className="hero-quote-attr">— on the paradox of choice</div>
                           </div>
                           <div className="hero-pills">
                             <span className="hero-pill">Mood-aware</span>

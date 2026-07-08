@@ -741,12 +741,13 @@ body {
 }
 
 /* choice step panels */
+/* Choice step panels */
 .step-question {
   font-family: var(--font-display);
   font-style: italic;
-  font-size: 24px;
+  font-size: 20px;
   color: var(--text-hi);
-  margin-bottom: 4px;
+  margin-bottom: 20px;
 }
 
 .step-grid {
@@ -759,50 +760,78 @@ body {
 .choice-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-card);
-  padding: 26px 16px;
-  text-align: center;
+  border-radius: 14px;
+  padding: 18px 20px;
   cursor: pointer;
   outline: none;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: border-color 0.25s var(--ease-spring),
-              background-color 0.25s var(--ease-spring),
-              transform 0.15s ease,
-              box-shadow 0.25s ease;
 }
 
 .choice-card:hover {
-  border-color: rgba(255, 255, 255, 0.25);
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.choice-card:focus-visible {
-  border-color: var(--green);
-}
-
-.choice-card:active {
-  transform: scale(0.97);
+  border-color: rgba(127, 255, 60, 0.35);
+  background: rgba(127, 255, 60, 0.04);
 }
 
 .choice-card.selected {
   border-color: var(--green);
-  background-color: rgba(156, 255, 107, 0.05);
-  box-shadow: 0 0 20px rgba(156, 255, 107, 0.08);
+  background: rgba(127, 255, 60, 0.08);
 }
 
 .choice-title {
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-hi);
 }
 
 .choice-desc {
   font-size: 12px;
+  color: var(--text-lo);
+}
+
+/* Wizard navigation buttons */
+.wizard-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-lo);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.back-btn:hover {
   color: var(--text-mid);
+}
+
+.continue-btn {
+  background: var(--green);
+  color: #0F1A08;
+  font-weight: 700;
+  padding: 12px 28px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.continue-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(156, 255, 107, 0.2);
+}
+
+.continue-btn:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
 }
 
 @media (max-width: 580px) {

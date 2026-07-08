@@ -4,21 +4,21 @@
    DESIGN TOKENS
 ============================================================ */
 :root {
-  --bg:           #0B0D08;
-  --surface:      rgba(15, 18, 12, 0.65);
-  --border:       rgba(255, 255, 255, 0.15);
-  --border-dim:   rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(127, 255, 60, 0.5);
-  
-  --green:        #9CFF6B;
-  --green-dim:    rgba(127, 255, 60, 0.18);
-  --violet:       #7C4FE0;
-  --red-soft:     #E0667A;
-  
-  /* Crisp Visibility Text Colors */
-  --text-hi:      #F4F8F0;  /* Crisp off-white */
-  --text-mid:     #C3D3B4;  /* Upgraded readability secondary */
-  --text-lo:      #7A9066;  /* Readable placeholders & hints */
+  --bg:             #0B0D08;
+  --bg-mid:         #14180F;
+  --surface:        rgba(255, 255, 255, 0.03);
+  --border:         rgba(255, 255, 255, 0.08);
+  --border-green:   rgba(127, 255, 60, 0.2);
+  --border-focus:   rgba(127, 255, 60, 0.55);
+  --green:          #9CFF6B;
+  --green-glow:     rgba(127, 255, 60, 0.1);
+  --violet:         #7C4FE0;
+  --violet-soft:    rgba(124, 79, 224, 0.15);
+  --red-soft:       #E0667A;
+  --amber:          #E8A65C;
+  --text-hi:        #EDF4E2;
+  --text-mid:       #8FA67A;
+  --text-lo:        #5C6B4D;
 
   --font-display: 'Fraunces', serif;
   --font-body:    'Manrope', sans-serif;

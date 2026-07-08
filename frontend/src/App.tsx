@@ -525,7 +525,7 @@ export default function App() {
       {/* Global Frosted Navbar */}
       <nav className="site-nav">
         <div className="nav-inner">
-          <span className="nav-wordmark">Antigravity <span>Agent</span></span>
+          <span className="nav-wordmark">drift</span>
           <div className="nav-links">
             <a href="#how" className="nav-link" onClick={(e) => e.preventDefault()}>How it works</a>
             <a href="#github" className="nav-link" onClick={(e) => e.preventDefault()}>GitHub</a>
@@ -584,14 +584,20 @@ export default function App() {
                     {driftStep !== 'support' && driftStep !== 'auth-prompt' && (
                       <div className="onboarding-left fade-up">
                         <div className="hero-section">
+                          <p className="hero-eyebrow">Cognitive bandwidth tool</p>
                           <h1 className="hero-headline">what can your brain actually handle right now?</h1>
-                          <p className="hero-subline">not what you like. what you can take on tonight.</p>
-                          
+                          <p className="hero-subline">not what you like — what you can actually absorb tonight.</p>
+                          <hr className="hero-divider" />
                           <div className="hero-quote">
                             <p className="hero-quote-text">
                               “Attention is the taking possession by the mind, in clear and vivid form, of one out of several possible objects.”
                             </p>
-                            <div className="hero-quote-attr">WILLIAM JAMES, 1890</div>
+                            <div className="hero-quote-attr">William James, 1890</div>
+                          </div>
+                          <div className="hero-pills">
+                            <span className="hero-pill">Mood-aware</span>
+                            <span className="hero-pill">No sign-up needed</span>
+                            <span className="hero-pill">Instant results</span>
                           </div>
                         </div>
                       </div>
@@ -617,6 +623,7 @@ export default function App() {
                           {driftStep === 'mood' && (
                             <div className="step-slide fade-up">
                               <div className="prompt-box-card">
+                                <label className="prompt-label">How are you feeling right now?</label>
                                 <textarea
                                   value={text}
                                   onChange={(e) => setText(e.target.value)}
@@ -786,53 +793,43 @@ export default function App() {
                     {/* 1. Horizontal State Band */}
                     <div className="state-band fade-up">
                       <div className="state-band-left">
+                        <p className="state-eyebrow">Your cognitive snapshot</p>
                         <div className="state-bucket-name">{getBucketName(userState.attentionCapacity)}</div>
-                        <div className="state-descriptor">your estimated cognitive state based on current focus and energy assessment.</div>
+                        <div className="state-descriptor">estimated from your mood, energy, and time — not a real biometric reading.</div>
                       </div>
                       
                       <div className="state-band-right">
-                        
                         <div className="state-gauge-item">
-                          <div className="gauge-label-row">
-                            <span className="gauge-label">Stress</span>
-                            <span className="gauge-value">{userState.stressLevel}%</span>
-                          </div>
+                          <span className="gauge-label">Stress</span>
                           <div className="gauge-track">
                             <div
                               className="gauge-fill-bar bar-stress"
                               style={{ width: animateGauges ? `${userState.stressLevel}%` : '0%' }}
                             />
                           </div>
+                          <div className="gauge-value">{userState.stressLevel}%</div>
                         </div>
 
                         <div className="state-gauge-item">
-                          <div className="gauge-label-row">
-                            <span className="gauge-label">Calm</span>
-                            <span className="gauge-value">{userState.calmLevel}%</span>
-                          </div>
+                          <span className="gauge-label">Calm</span>
                           <div className="gauge-track">
                             <div
                               className="gauge-fill-bar bar-calm"
                               style={{ width: animateGauges ? `${userState.calmLevel}%` : '0%' }}
                             />
                           </div>
+                          <div className="gauge-value">{userState.calmLevel}%</div>
                         </div>
 
                         <div className="state-gauge-item">
-                          <div className="gauge-label-row">
-                            <span className="gauge-label">Attention</span>
-                            <span className="gauge-value">{userState.attentionCapacity}%</span>
-                          </div>
+                          <span className="gauge-label">Attention</span>
                           <div className="gauge-track">
                             <div
                               className="gauge-fill-bar bar-attention"
                               style={{ width: animateGauges ? `${userState.attentionCapacity}%` : '0%' }}
                             />
                           </div>
-                        </div>
-
-                        <div className="state-disclaimer">
-                          estimated from what you typed — not a real biometric reading
+                          <div className="gauge-value">{userState.attentionCapacity}%</div>
                         </div>
                       </div>
                     </div>

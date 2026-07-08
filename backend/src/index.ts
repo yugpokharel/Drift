@@ -6,6 +6,8 @@ import { computeUserState } from './services/stateHeuristic.js';
 import { getRecommendations } from './services/matcher.js';
 import { fetchTMDBRecommendations } from './services/tmdbService.js';
 import { fetchLastFMTrack } from './services/lastfmService.js';
+import { connectDB } from './db.js';
+import sessionRouter from './routes/sessionRoutes.js';
 
 dotenv.config();
 
@@ -13,12 +15,15 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors({
-  origin: '*', // Allow all origins for the MVP
+  origin: '*',
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type']
 }));
 
 app.use(express.json());
+
+// Session persistence routes
+app.use('/api/sessions', sessionRouter);
 
 // Logging middleware
 app.use((req, res, next) => {
@@ -114,6 +119,15 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'healthy', time: new Date().toISOString() });
 });
 
-app.listen(PORT, () => {
-  console.log(`Drift Backend listening on port ${PORT}`);
-});
+// Connect to MongoDB then start server
+(async () => {
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Drift Backend listening on port ${PORT}`);
+    });
+  } catch (err: any) {
+    console.error('[Startup] Failed to connect to MongoDB:', err.message);
+    process.exit(1);
+  }
+})();

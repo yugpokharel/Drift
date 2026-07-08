@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './App.css';
+import Progress from './Progress';
 
 interface UserState {
   stressLevel: number;
@@ -44,6 +45,7 @@ const WELLNESS_FACTS = [
 export default function App() {
   // Navigation & Core States
   const [activeTab, setActiveTab] = useState<Tab>('drift');
+  const [currentPage, setCurrentPage] = useState<'home' | 'progress'>('home');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
@@ -302,6 +304,30 @@ export default function App() {
       const recsData: Recommendations = await recsResponse.json();
       setRecommendations(recsData);
       setDriftStep('results');
+
+      // Fire-and-forget: save session to MongoDB (never blocks the UI)
+      const bucketLabel = stateData.attentionCapacity < 35
+        ? 'brain-fried'
+        : stateData.attentionCapacity < 65
+        ? 'relaxed'
+        : 'hyper-focused';
+      fetch(`${API_BASE}/sessions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          stress:    stateData.stressLevel,
+          calm:      stateData.calmLevel,
+          attention: stateData.attentionCapacity,
+          bucket:    bucketLabel,
+          moodLabel: mood,
+          moodText:  text,
+          recommendations: {
+            tv:    { title: recsData.tv_show.title,  note: recsData.tv_show.extraInfo },
+            music: { title: recsData.music.title,    note: recsData.music.extraInfo },
+            movie: { title: recsData.movie.title,    note: recsData.movie.extraInfo }
+          }
+        })
+      }).catch(err => console.warn('[Session save failed silently]', err));
     } catch (err: any) {
       setError(err.message || 'An error occurred during recommendations.');
     } finally {
@@ -525,16 +551,20 @@ export default function App() {
       {/* Global Frosted Navbar */}
       <nav className="site-nav">
         <div className="nav-inner">
-          <span className="nav-wordmark">drift</span>
+          <button className="nav-wordmark" onClick={() => setCurrentPage('home')}>drift</button>
           <div className="nav-links">
-            <a href="#how" className="nav-link" onClick={(e) => e.preventDefault()}>How it works</a>
-            <a href="#github" className="nav-link" onClick={(e) => e.preventDefault()}>GitHub</a>
+            <button className="nav-link" onClick={() => setCurrentPage('progress')}>Progress</button>
+            <a href="https://github.com/yugpokharel/Drift" target="_blank" rel="noreferrer" className="nav-link">GitHub</a>
           </div>
         </div>
       </nav>
 
       {/* Page Shell with centered grid columns */}
       <div className="page-shell">
+        {currentPage === 'progress' ? (
+          <Progress onNavigateHome={() => setCurrentPage('home')} />
+        ) : (
+        <>
         <div className="content-col">
           {isLoading ? (
             <div className="loading-scene fade-in">
@@ -909,6 +939,8 @@ export default function App() {
               <span className="footer-text">built with Node.js + Express</span>
             </div>
           </footer>
+        )}
+        </>
         )}
       </div>
     </div>

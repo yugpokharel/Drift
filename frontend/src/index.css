@@ -553,7 +553,7 @@ body {
 /* Labeled Step Progress with connect line */
 .step-progress {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0;
   margin-bottom: 28px;
 }
@@ -561,42 +561,53 @@ body {
 .step-progress-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  min-width: 64px;
+  gap: 5px;
 }
 
 .step-progress-connector {
   flex: 1;
   height: 1px;
-  background: rgba(255, 255, 255, 0.08);
-  margin: 0 10px;
-  margin-top: 8px;
-  flex-shrink: 1;
+  background: var(--border);
+  margin: 0 16px;
+  margin-top: -14px;
 }
 
 .step-progress-connector.s-completed {
-  background: rgba(124, 79, 224, 0.45);
+  background: var(--violet);
 }
 
 .step-num {
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  font-family: monospace;
+  font-size: 11px;
   color: var(--text-lo);
   transition: color 0.3s ease;
 }
 
+.step-progress-item.s-current .step-num::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--green);
+  margin-right: 6px;
+  box-shadow: 0 0 6px var(--green);
+}
+
 .step-label {
-  font-size: 12.5px;
-  font-weight: 600;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
   color: var(--text-lo);
   transition: color 0.3s ease;
 }
 
 .step-progress-item.s-current .step-num  { color: var(--green); }
-.step-progress-item.s-current .step-label { color: var(--text-hi); }
+.step-progress-item.s-current .step-label { color: var(--green); }
 .step-progress-item.s-completed .step-num  { color: var(--violet); }
-.step-progress-item.s-completed .step-label { color: var(--text-mid); }
+.step-progress-item.s-completed .step-label { color: var(--violet); }
 
 .step-content-wrapper {
   width: 100%;

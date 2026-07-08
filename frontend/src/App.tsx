@@ -457,27 +457,41 @@ export default function App() {
     );
   };
 
-  const renderProgressDots = () => {
+  const renderStepProgress = () => {
     // 3 steps: mood (0), time (1), energy (2)
     let currentIdx = 0;
     if (driftStep === 'time') currentIdx = 1;
     else if (driftStep === 'energy') currentIdx = 2;
     else if (driftStep === 'results') return null; // hide on results
-    
+
     // Hide progress indicators for support or loading/auth prompts to preserve clean spacing
     if (driftStep === 'support' || driftStep === 'auth-prompt') return null;
 
     return (
-      <div className="progress-dots">
-        {[0, 1, 2].map((idx) => {
-          let stateClass = 'upcoming';
-          if (idx === currentIdx) {
-            stateClass = 'current';
-          } else if (idx < currentIdx) {
-            stateClass = 'completed';
-          }
-          return <div key={idx} className={`progress-dot ${stateClass}`} />;
-        })}
+      <div className="step-progress">
+        {/* Step 1 */}
+        <div className={`step-progress-item ${currentIdx === 0 ? 's-current' : currentIdx > 0 ? 's-completed' : 'upcoming'}`}>
+          <span className="step-num">01</span>
+          <span className="step-label">mood</span>
+        </div>
+        
+        {/* Connector 1 -> 2 */}
+        <div className={`step-progress-connector ${currentIdx > 0 ? 's-completed' : ''}`} />
+
+        {/* Step 2 */}
+        <div className={`step-progress-item ${currentIdx === 1 ? 's-current' : currentIdx > 1 ? 's-completed' : 'upcoming'}`}>
+          <span className="step-num">02</span>
+          <span className="step-label">time</span>
+        </div>
+
+        {/* Connector 2 -> 3 */}
+        <div className={`step-progress-connector ${currentIdx > 1 ? 's-completed' : ''}`} />
+
+        {/* Step 3 */}
+        <div className={`step-progress-item ${currentIdx === 2 ? 's-current' : currentIdx > 2 ? 's-completed' : 'upcoming'}`}>
+          <span className="step-num">03</span>
+          <span className="step-label">energy</span>
+        </div>
       </div>
     );
   };
@@ -508,354 +522,383 @@ export default function App() {
       <div className="vignette"></div>
       <div className="grain"></div>
 
-      {/* Main Container */}
-      <div className="workspace-container">
-        {isLoading ? (
-          <div className="loading-scene fade-in">
-            {userState ? (
-              /* Custom Circular Loading Dial */
-              <div className="loading-dial-wrapper">
-                <div className="circular-dial">
-                  <svg width="180" height="180" viewBox="0 0 180 180">
-                    <circle cx="90" cy="90" r="80" className="dial-track" />
-                    <circle
-                      cx="90"
-                      cy="90"
-                      r="80"
-                      className="dial-fill"
-                      strokeDasharray="502.65"
-                      strokeDashoffset={dialOffset}
-                    />
-                  </svg>
-                  <div className="dial-center">
-                    <span className="dial-bucket-name">{getBucketName(userState.attentionCapacity)}</span>
-                  </div>
-                </div>
-                <div className="loading-messages">
-                  <p className="loading-message-text">{LOADING_MESSAGES[messageIdx]}</p>
-                </div>
-              </div>
-            ) : (
-              /* Initial Fact Loader for Mood text analysis */
-              <div className="loading-content">
-                <div className="breathing-ring"></div>
-                <div className="fun-fact-container">
-                  <span className="fun-fact-label">Wellness Insight</span>
-                  <p className="fun-fact-text">"{currentFact}"</p>
-                </div>
-                <div className="calm-spinner-subtitle">Aligning recommendations...</div>
-              </div>
-            )}
+      {/* Global Frosted Navbar */}
+      <nav className="site-nav">
+        <div className="nav-inner">
+          <span className="nav-wordmark">drift</span>
+          <div className="nav-links">
+            <a href="#how" className="nav-link" onClick={(e) => e.preventDefault()}>How it works</a>
+            <a href="#github" className="nav-link" onClick={(e) => e.preventDefault()}>GitHub</a>
           </div>
-        ) : (
-          <div className="content-viewport">
-            {driftStep !== 'results' ? (
-              /* SCREEN 1: Onboarding Viewport */
-              <div className="onboarding-container fade-in">
-                
-                {/* 1. Quote block */}
-                {driftStep !== 'support' && driftStep !== 'auth-prompt' && (
-                  <div className="quote-block fade-up">
-                    <p className="quote-text">
-                      “Attention is the taking possession by the mind, in clear and vivid form, of one out of several possible objects.”
-                    </p>
-                    <div className="quote-attribution">WILLIAM JAMES, 1890</div>
+        </div>
+      </nav>
+
+      {/* Page Shell with centered grid columns */}
+      <div className="page-shell">
+        <div className="content-col">
+          {isLoading ? (
+            <div className="loading-scene fade-in">
+              {userState ? (
+                /* Custom Circular Loading Dial */
+                <div className="loading-dial-wrapper">
+                  <div className="circular-dial">
+                    <svg width="180" height="180" viewBox="0 0 180 180">
+                      <circle cx="90" cy="90" r="80" className="dial-track" />
+                      <circle
+                        cx="90"
+                        cy="90"
+                        r="80"
+                        className="dial-fill"
+                        strokeDasharray="502.65"
+                        strokeDashoffset={dialOffset}
+                      />
+                    </svg>
+                    <div className="dial-center">
+                      <span className="dial-bucket-name">{getBucketName(userState.attentionCapacity)}</span>
+                    </div>
                   </div>
-                )}
-
-                {/* 2. Progress dots */}
-                {renderProgressDots()}
-
-                {/* 3. Onboarding steps content */}
-                <div className="step-content-wrapper">
+                  <div className="loading-messages">
+                    <p className="loading-message-text">{LOADING_MESSAGES[messageIdx]}</p>
+                  </div>
+                </div>
+              ) : (
+                /* Initial Fact Loader for Mood text analysis */
+                <div className="loading-content">
+                  <div className="breathing-ring"></div>
+                  <div className="fun-fact-container">
+                    <span className="fun-fact-label">Wellness Insight</span>
+                    <p className="fun-fact-text">"{currentFact}"</p>
+                  </div>
+                  <div className="calm-spinner-subtitle">Aligning recommendations...</div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              {driftStep !== 'results' ? (
+                /* SCREEN 1: Onboarding Viewport */
+                <div className="screen-one">
                   
-                  {/* Step 1: Mood */}
-                  {driftStep === 'mood' && (
-                    <div className="step-slide fade-up">
-                      <div className="prompt-box-card">
-                        <textarea
-                          value={text}
-                          onChange={(e) => setText(e.target.value)}
-                          placeholder="how's it going, really"
-                          className="mood-textarea"
-                          maxLength={500}
-                        />
-                        <div className="prompt-box-footer">
-                          <span className="hint-text">no thinking required</span>
-                          <button
-                            onClick={handleMoodSubmit}
-                            disabled={!text.trim()}
-                            className="send-btn"
-                            aria-label="Send mood input"
-                          >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                              <line x1="22" y1="2" x2="11" y2="13"></line>
-                              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="suggestions-row">
-                        {suggestions.map((s, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => handleSuggestionClick(s.text, idx)}
-                            className={`suggestion-pill ${activePillIdx === idx ? 'pill-active' : ''}`}
-                            type="button"
-                          >
-                            {s.label}
-                          </button>
-                        ))}
+                  {/* Hero Section */}
+                  {driftStep !== 'support' && driftStep !== 'auth-prompt' && (
+                    <div className="hero-section fade-up">
+                      <h1 className="hero-headline">what can your brain actually handle right now?</h1>
+                      <p className="hero-subline">not what you like. what you can take on tonight.</p>
+                      
+                      <div className="hero-quote">
+                        <p className="hero-quote-text">
+                          “Attention is the taking possession by the mind, in clear and vivid form, of one out of several possible objects.”
+                        </p>
+                        <div className="hero-quote-attr">WILLIAM JAMES, 1890</div>
                       </div>
                     </div>
                   )}
 
-                  {/* Grief Support */}
-                  {driftStep === 'support' && (
-                    <div className="step-slide fade-up grief-space">
-                      <h1 className="title-accent-violet" style={{ fontSize: '2rem', marginBottom: '12px' }}>
-                        Take a breath.
-                      </h1>
-                      <p className="grief-message">
-                        I hear you. That sounds really hard.<br />
-                        I am finding something gentle for you right now.
-                      </p>
-                      <div className="grief-countdown-bar">
-                        <div
-                          className="grief-countdown-fill"
-                          style={{ width: `${((3 - supportCountdown) / 3) * 100}%` }}
-                        />
-                      </div>
-                      <p className="grief-hint">Loading your comfort space{'.'.repeat(3 - supportCountdown + 1)}</p>
+                  {/* Input & Form Area */}
+                  <div className="input-section fade-in">
+                    {/* Step Progress Bar (Labeled Steps with Connector Line) */}
+                    {renderStepProgress()}
+
+                    <div className="step-content-wrapper">
+                      {/* Step 1: Mood */}
+                      {driftStep === 'mood' && (
+                        <div className="step-slide fade-up">
+                          <div className="prompt-box-card">
+                            <textarea
+                              value={text}
+                              onChange={(e) => setText(e.target.value)}
+                              placeholder="how's it going, really"
+                              className="mood-textarea"
+                              maxLength={500}
+                            />
+                            <div className="prompt-box-footer">
+                              <span className="hint-text">no thinking required</span>
+                              <button
+                                onClick={handleMoodSubmit}
+                                disabled={!text.trim()}
+                                className="send-btn"
+                                aria-label="Send mood input"
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="suggestions-row">
+                            {suggestions.map((s, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => handleSuggestionClick(s.text, idx)}
+                                className={`suggestion-pill ${activePillIdx === idx ? 'pill-active' : ''}`}
+                                type="button"
+                              >
+                                {s.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Grief Support */}
+                      {driftStep === 'support' && (
+                        <div className="step-slide fade-up grief-space">
+                          <h1 className="title-accent-violet" style={{ fontSize: '2rem', marginBottom: '12px' }}>
+                            Take a breath.
+                          </h1>
+                          <p className="grief-message">
+                            I hear you. That sounds really hard.<br />
+                            I am finding something gentle for you right now.
+                          </p>
+                          <div className="grief-countdown-bar">
+                            <div
+                              className="grief-countdown-fill"
+                              style={{ width: `${((3 - supportCountdown) / 3) * 100}%` }}
+                            />
+                          </div>
+                          <p className="grief-hint">Loading your comfort space{'.'.repeat(3 - supportCountdown + 1)}</p>
+                        </div>
+                      )}
+
+                      {/* Auth Prompt */}
+                      {driftStep === 'auth-prompt' && (
+                        <div className="step-slide fade-up text-center auth-prompt-card">
+                          <h1 className="title-accent-green">Track Your State</h1>
+                          <p className="subtitle">Would you like to log in to save your cognitive snapshots over time?</p>
+                          <div className="button-group-vertical">
+                            <button
+                              onClick={() => {
+                                setAuthStep('login');
+                                setDriftStep('time');
+                              }}
+                              className="action-button"
+                            >
+                              Sign In / Create Account
+                            </button>
+                            <button
+                              onClick={() => setDriftStep('time')}
+                              className="secondary-button"
+                            >
+                              Continue as Guest
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Step 2: Time Available */}
+                      {driftStep === 'time' && (
+                        <div className="step-slide fade-up">
+                          <h2 className="step-question">how much time do you have to spare?</h2>
+                          <div className="step-grid">
+                            <div
+                              className={`choice-card ${timeAvailable === 'short' ? 'selected' : ''}`}
+                              onClick={() => {
+                                setTimeAvailable('short');
+                                setDriftStep('energy');
+                              }}
+                            >
+                              <div className="choice-title">A few minutes</div>
+                              <div className="choice-desc">Under 30 mins</div>
+                            </div>
+
+                            <div
+                              className={`choice-card ${timeAvailable === 'medium' ? 'selected' : ''}`}
+                              onClick={() => {
+                                setTimeAvailable('medium');
+                                setDriftStep('energy');
+                              }}
+                            >
+                              <div className="choice-title">An episode or two</div>
+                              <div className="choice-desc">30 to 90 mins</div>
+                            </div>
+
+                            <div
+                              className={`choice-card ${timeAvailable === 'long' ? 'selected' : ''}`}
+                              onClick={() => {
+                                setTimeAvailable('long');
+                                setDriftStep('energy');
+                              }}
+                            >
+                              <div className="choice-title">The whole evening</div>
+                              <div className="choice-desc">Several hours</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Step 3: Energy Level */}
+                      {driftStep === 'energy' && (
+                        <div className="step-slide fade-up">
+                          <h2 className="step-question">what is your cognitive energy like?</h2>
+                          <div className="step-grid">
+                            <div
+                              className={`choice-card ${energyLevel === 'low' ? 'selected' : ''}`}
+                              onClick={() => handleEnergySelect('low')}
+                            >
+                              <div className="choice-title">Basically none</div>
+                              <div className="choice-desc">Exhausted, resting</div>
+                            </div>
+
+                            <div
+                              className={`choice-card ${energyLevel === 'mid' ? 'selected' : ''}`}
+                              onClick={() => handleEnergySelect('mid')}
+                            >
+                              <div className="choice-title">Some</div>
+                              <div className="choice-desc">Typical attention</div>
+                            </div>
+
+                            <div
+                              className={`choice-card ${energyLevel === 'high' ? 'selected' : ''}`}
+                              onClick={() => handleEnergySelect('high')}
+                            >
+                              <div className="choice-title">Plenty</div>
+                              <div className="choice-desc">Focused, energetic</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
-
-                  {/* Auth Prompt */}
-                  {driftStep === 'auth-prompt' && (
-                    <div className="step-slide fade-up text-center auth-prompt-card">
-                      <h1 className="title-accent-green">Track Your State</h1>
-                      <p className="subtitle">Would you like to log in to save your cognitive snapshots over time?</p>
-                      <div className="button-group-vertical">
-                        <button
-                          onClick={() => {
-                            setAuthStep('login');
-                            setDriftStep('time');
-                          }}
-                          className="action-button"
-                        >
-                          Sign In / Create Account
-                        </button>
-                        <button
-                          onClick={() => setDriftStep('time')}
-                          className="secondary-button"
-                        >
-                          Continue as Guest
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Step 2: Time Available */}
-                  {driftStep === 'time' && (
-                    <div className="step-slide fade-up">
-                      <h2 className="step-question">how much time do you have to spare?</h2>
-                      <div className="step-grid">
-                        <div
-                          className={`choice-card ${timeAvailable === 'short' ? 'selected' : ''}`}
-                          onClick={() => {
-                            setTimeAvailable('short');
-                            setDriftStep('energy');
-                          }}
-                        >
-                          <div className="choice-title">A few minutes</div>
-                          <div className="choice-desc">Under 30 mins</div>
-                        </div>
-
-                        <div
-                          className={`choice-card ${timeAvailable === 'medium' ? 'selected' : ''}`}
-                          onClick={() => {
-                            setTimeAvailable('medium');
-                            setDriftStep('energy');
-                          }}
-                        >
-                          <div className="choice-title">An episode or two</div>
-                          <div className="choice-desc">30 to 90 mins</div>
-                        </div>
-
-                        <div
-                          className={`choice-card ${timeAvailable === 'long' ? 'selected' : ''}`}
-                          onClick={() => {
-                            setTimeAvailable('long');
-                            setDriftStep('energy');
-                          }}
-                        >
-                          <div className="choice-title">The whole evening</div>
-                          <div className="choice-desc">Several hours</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Step 3: Energy Level */}
-                  {driftStep === 'energy' && (
-                    <div className="step-slide fade-up">
-                      <h2 className="step-question">what is your cognitive energy like?</h2>
-                      <div className="step-grid">
-                        <div
-                          className={`choice-card ${energyLevel === 'low' ? 'selected' : ''}`}
-                          onClick={() => handleEnergySelect('low')}
-                        >
-                          <div className="choice-title">Basically none</div>
-                          <div className="choice-desc">Exhausted, resting</div>
-                        </div>
-
-                        <div
-                          className={`choice-card ${energyLevel === 'mid' ? 'selected' : ''}`}
-                          onClick={() => handleEnergySelect('mid')}
-                        >
-                          <div className="choice-title">Some</div>
-                          <div className="choice-desc">Typical attention</div>
-                        </div>
-
-                        <div
-                          className={`choice-card ${energyLevel === 'high' ? 'selected' : ''}`}
-                          onClick={() => handleEnergySelect('high')}
-                        >
-                          <div className="choice-title">Plenty</div>
-                          <div className="choice-desc">Focused, energetic</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  </div>
 
                 </div>
-
-              </div>
-            ) : (
-              /* SCREEN 2: Results Display */
-              userState && recommendations && (
-                <div className="results-container fade-in">
-                  
-                  {/* 1. State panel card */}
-                  <div className="state-panel-card fade-up">
-                    <div className="state-panel-header">your estimated state right now</div>
-                    <div className="state-gauges-grid">
-                      
-                      <div className="state-gauge-item">
-                        <div className="gauge-label-row">
-                          <span className="gauge-label">Stress</span>
-                        </div>
-                        <div className="gauge-track">
-                          <div
-                            className="gauge-fill-bar bar-stress"
-                            style={{ width: animateGauges ? `${userState.stressLevel}%` : '0%' }}
-                          />
-                        </div>
-                        <div className="gauge-value">{userState.stressLevel}%</div>
-                      </div>
-
-                      <div className="state-gauge-item">
-                        <div className="gauge-label-row">
-                          <span className="gauge-label">Calm</span>
-                        </div>
-                        <div className="gauge-track">
-                          <div
-                            className="gauge-fill-bar bar-calm"
-                            style={{ width: animateGauges ? `${userState.calmLevel}%` : '0%' }}
-                          />
-                        </div>
-                        <div className="gauge-value">{userState.calmLevel}%</div>
-                      </div>
-
-                      <div className="state-gauge-item">
-                        <div className="gauge-label-row">
-                          <span className="gauge-label">Attention</span>
-                        </div>
-                        <div className="gauge-track">
-                          <div
-                            className="gauge-fill-bar bar-attention"
-                            style={{ width: animateGauges ? `${userState.attentionCapacity}%` : '0%' }}
-                          />
-                        </div>
-                        <div className="gauge-value">{userState.attentionCapacity}%</div>
-                      </div>
-
-                    </div>
-                    <div className="state-disclaimer">
-                      estimated from what you typed — not a real biometric reading
-                    </div>
-                  </div>
-
-                  {/* 2. Headline */}
-                  <h1 className="results-headline fade-up">here's what fits</h1>
-
-                  {/* 3. Three recommendation cards */}
-                  <div className="cards-stack">
+              ) : (
+                /* SCREEN 2: Results Display */
+                userState && recommendations && (
+                  <div className="screen-two fade-in">
                     
-                    {/* TV Show */}
-                    <div className="recommendation-card card-stagger-1">
-                      <div className="card-top-row">
-                        <div className="category-title-stack">
-                          <span className="category-label">TV Show</span>
+                    {/* 1. Horizontal State Band */}
+                    <div className="state-band fade-up">
+                      <div className="state-band-left">
+                        <div className="state-bucket-name">{getBucketName(userState.attentionCapacity)}</div>
+                        <div className="state-descriptor">your estimated cognitive state based on current focus and energy assessment.</div>
+                      </div>
+                      
+                      <div className="state-band-right">
+                        
+                        <div className="state-gauge-item">
+                          <div className="gauge-label-row">
+                            <span className="gauge-label">Stress</span>
+                            <span className="gauge-value">{userState.stressLevel}%</span>
+                          </div>
+                          <div className="gauge-track">
+                            <div
+                              className="gauge-fill-bar bar-stress"
+                              style={{ width: animateGauges ? `${userState.stressLevel}%` : '0%' }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="state-gauge-item">
+                          <div className="gauge-label-row">
+                            <span className="gauge-label">Calm</span>
+                            <span className="gauge-value">{userState.calmLevel}%</span>
+                          </div>
+                          <div className="gauge-track">
+                            <div
+                              className="gauge-fill-bar bar-calm"
+                              style={{ width: animateGauges ? `${userState.calmLevel}%` : '0%' }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="state-gauge-item">
+                          <div className="gauge-label-row">
+                            <span className="gauge-label">Attention</span>
+                            <span className="gauge-value">{userState.attentionCapacity}%</span>
+                          </div>
+                          <div className="gauge-track">
+                            <div
+                              className="gauge-fill-bar bar-attention"
+                              style={{ width: animateGauges ? `${userState.attentionCapacity}%` : '0%' }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="state-disclaimer">
+                          estimated from what you typed — not a real biometric reading
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 2. Headline & Subline */}
+                    <div className="results-section-head fade-up">
+                      <h1 className="results-headline">here's what fits tonight</h1>
+                      <p className="results-subline">one pick per category, matched to where you're at</p>
+                    </div>
+
+                    {/* 3. Three recommendation cards in Bento Grid */}
+                    <div className="bento-grid">
+                      
+                      {/* TV Show - HERO PICK */}
+                      <div className="bento-hero card-stagger-1">
+                        <div className="recommendation-card">
+                          <div className="category-label">TV Show</div>
                           <h2 className="item-title">{recommendations.tv_show.title}</h2>
+                          <p className="item-description">{recommendations.tv_show.extraInfo}</p>
+                          <div className="item-tags-row">
+                            {renderTagBadge('Stress', recommendations.tv_show.stress)}
+                            {renderTagBadge('Calm', recommendations.tv_show.calm)}
+                            {renderTagBadge('Attention', recommendations.tv_show.attention)}
+                          </div>
                         </div>
                       </div>
-                      <p className="item-description">{recommendations.tv_show.extraInfo}</p>
-                      <div className="item-tags-row">
-                        {renderTagBadge('Stress', recommendations.tv_show.stress)}
-                        {renderTagBadge('Calm', recommendations.tv_show.calm)}
-                        {renderTagBadge('Attention', recommendations.tv_show.attention)}
-                      </div>
-                    </div>
 
-                    {/* Movie */}
-                    <div className="recommendation-card card-stagger-2">
-                      <div className="card-top-row">
-                        <div className="category-title-stack">
-                          <span className="category-label">Movie</span>
+                      {/* Movie - SECONDARY */}
+                      <div className="bento-secondary card-stagger-2">
+                        <div className="recommendation-card">
+                          <div className="category-label">Movie</div>
                           <h2 className="item-title">{recommendations.movie.title}</h2>
+                          <p className="item-description">{recommendations.movie.extraInfo}</p>
+                          <div className="item-tags-row">
+                            {renderTagBadge('Stress', recommendations.movie.stress)}
+                            {renderTagBadge('Calm', recommendations.movie.calm)}
+                            {renderTagBadge('Attention', recommendations.movie.attention)}
+                          </div>
                         </div>
                       </div>
-                      <p className="item-description">{recommendations.movie.extraInfo}</p>
-                      <div className="item-tags-row">
-                        {renderTagBadge('Stress', recommendations.movie.stress)}
-                        {renderTagBadge('Calm', recommendations.movie.calm)}
-                        {renderTagBadge('Attention', recommendations.movie.attention)}
-                      </div>
-                    </div>
 
-                    {/* Music */}
-                    <div className="recommendation-card card-stagger-3">
-                      <div className="card-top-row">
-                        <div className="category-title-stack">
-                          <span className="category-label">Music</span>
+                      {/* Music - SECONDARY */}
+                      <div className="bento-secondary card-stagger-3">
+                        <div className="recommendation-card">
+                          <div className="category-label">Music</div>
                           <h2 className="item-title">{recommendations.music.title}</h2>
+                          <p className="item-description">{recommendations.music.extraInfo}</p>
+                          <div className="item-tags-row">
+                            {renderTagBadge('Stress', recommendations.music.stress)}
+                            {renderTagBadge('Calm', recommendations.music.calm)}
+                            {renderTagBadge('Attention', recommendations.music.attention)}
+                          </div>
                         </div>
                       </div>
-                      <p className="item-description">{recommendations.music.extraInfo}</p>
-                      <div className="item-tags-row">
-                        {renderTagBadge('Stress', recommendations.music.stress)}
-                        {renderTagBadge('Calm', recommendations.music.calm)}
-                        {renderTagBadge('Attention', recommendations.music.attention)}
-                      </div>
+
                     </div>
 
-                  </div>
-
-                  {/* 4. Ask again button */}
-                  <div className="ask-again-wrapper">
-                    <button onClick={handleReset} className="ask-again-btn">
-                      Ask again
-                    </button>
-                  </div>
+                    {/* 4. Ask again button */}
+                    <div className="ask-again-wrapper fade-up">
+                      <button onClick={handleReset} className="ask-again-btn">
+                        Ask again
+                      </button>
+                    </div>
 
                   </div>
                 )
               )}
-            </div>
+            </>
           )}
         </div>
+
+        {/* Global Footer (Screen 1 only) */}
+        {driftStep !== 'results' && !isLoading && (
+          <footer className="site-footer">
+            <div className="footer-inner">
+              <span className="footer-text">drift · final year project · 2025</span>
+              <span className="footer-text">built with Node.js + Express</span>
+            </div>
+          </footer>
+        )}
       </div>
-    );
-  }
+    </div>
+  );
+}

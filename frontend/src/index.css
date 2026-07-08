@@ -1069,99 +1069,111 @@ body {
 /* Horizontal State Band layout */
 .state-band {
   width: 100%;
-  display: grid;
-  grid-template-columns: 2fr 3fr;
-  gap: 48px;
-  align-items: center;
-  background: var(--surface);
+  background: rgba(14, 18, 10, 0.65);
   border: 1px solid var(--border);
   border-radius: 20px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  padding: 36px 40px;
+  padding: 36px 44px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  margin-bottom: 44px;
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 48px;
+  align-items: center;
 }
 
 .state-band-left {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+}
+
+.state-eyebrow {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-lo);
+  margin-bottom: 14px;
 }
 
 .state-bucket-name {
   font-family: var(--font-display);
   font-style: italic;
-  font-weight: 400;
-  font-size: clamp(36px, 4.5vw, 52px);
-  line-height: 1.06;
+  font-weight: 360;
+  font-size: clamp(36px, 4vw, 52px);
+  line-height: 1.1;
   color: var(--text-hi);
-  letter-spacing: -0.02em;
+  margin-bottom: 10px;
 }
 
 .state-descriptor {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--text-mid);
-  max-width: 260px;
-  line-height: 1.55;
+  line-height: 1.5;
 }
 
 .state-band-right {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
 }
 
 .state-gauge-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-
-.gauge-label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .gauge-label {
-  font-size: 11.5px;
+  font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
   color: var(--text-lo);
-  font-weight: 600;
-}
-
-.gauge-value {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 16px;
-  color: var(--text-hi);
+  margin-bottom: 10px;
 }
 
 .gauge-track {
   width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-pill);
+  height: 5px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 3px;
   overflow: hidden;
 }
 
 .gauge-fill-bar {
   height: 100%;
-  border-radius: var(--radius-pill);
+  border-radius: 3px;
   width: 0%;
-  transition: width 0.8s var(--ease-reveal);
-  transition-delay: 300ms;
+  transition: width 0.85s cubic-bezier(0.65, 0, 0.35, 1);
+  transition-delay: 350ms;
 }
 
-.bar-stress     { background-color: var(--red-soft); }
-.bar-calm       { background-color: var(--violet); }
-.bar-attention  { background-color: var(--green); }
+.bar-stress {
+  background-color: #E0667A;
+}
+
+.bar-calm {
+  background-color: #7C4FE0;
+}
+
+.bar-attention {
+  background-color: #9CFF6B;
+}
+
+.gauge-value {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--text-hi);
+  margin-top: 10px;
+}
 
 .state-disclaimer {
+  grid-column: 1 / -1;
   font-size: 11px;
   color: var(--text-lo);
-  letter-spacing: 0.02em;
-  margin-top: 4px;
+  margin-top: 20px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
 }
 
 @media (max-width: 760px) {
@@ -1169,6 +1181,15 @@ body {
     grid-template-columns: 1fr;
     gap: 28px;
     padding: 28px 24px;
+  }
+
+  .state-band-right {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .state-disclaimer {
+    grid-column: 1;
   }
 }
 

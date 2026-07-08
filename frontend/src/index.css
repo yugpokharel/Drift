@@ -621,60 +621,70 @@ body {
 }
 
 /* PREMIUM FLOATING GLASS CONTAINER */
+/* STEP 1 — Mood input container card */
 .prompt-box-card {
   width: 100%;
-  background: var(--surface); /* Darker semi-transparent overlay */
-  border: 1px solid var(--border); /* Crisp 1px white border */
-  border-radius: var(--radius-card);
-  backdrop-filter: blur(20px); /* Enhanced backdrop blur */
-  -webkit-backdrop-filter: blur(20px);
-  padding: 26px 28px 20px;
+  background: rgba(14, 18, 10, 0.75);
+  border: 1px solid var(--border-green);
+  border-radius: 20px;
+  padding: 26px 28px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  transition: border-color 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-spring);
+  transition: all 0.3s ease;
 }
 
 .prompt-box-card:focus-within {
   border-color: var(--border-focus);
-  box-shadow: 0 0 32px rgba(127, 255, 60, 0.12);
+  box-shadow: 0 0 0 1px rgba(127, 255, 60, 0.1),
+              0 0 40px rgba(127, 255, 60, 0.07);
+}
+
+.prompt-label {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-lo);
+  margin-bottom: 14px;
+  display: block;
 }
 
 .mood-textarea {
   width: 100%;
-  min-height: 104px;
+  min-height: 80px;
+  max-height: 180px;
   background: transparent;
   border: none;
   outline: none;
   resize: none;
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 17px;
+  line-height: 1.55;
   color: var(--text-hi);
-  line-height: 1.58;
 }
 
 .mood-textarea::placeholder {
-  color: rgba(237, 244, 226, 0.45); /* Fully legible soft green-white */
+  color: var(--text-lo);
 }
 
 .prompt-box-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 18px;
 }
 
 .hint-text {
   font-size: 12px;
   color: var(--text-lo);
-  letter-spacing: 0.02em;
 }
 
 .send-btn {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: transparent;
-  border: 1px solid rgba(156, 255, 107, 0.35);
+  background: rgba(127, 255, 60, 0.1);
+  border: 1px solid rgba(127, 255, 60, 0.35);
   color: var(--green);
   display: flex;
   align-items: center;
@@ -682,66 +692,52 @@ body {
   cursor: pointer;
   outline: none;
   flex-shrink: 0;
-  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .send-btn:hover:not(:disabled) {
-  background-color: rgba(156, 255, 107, 0.08);
-  border-color: var(--green);
-}
-
-.send-btn:active:not(:disabled) {
-  transform: scale(0.94);
+  background: rgba(127, 255, 60, 0.2);
+  border-color: rgba(127, 255, 60, 0.65);
+  transform: translateY(-1px);
 }
 
 .send-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.28;
   cursor: not-allowed;
 }
 
-/* INTERACTIVE GLASS SUGGESTION PILLS */
+/* Quick-tap suggestion pills */
 .suggestions-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
+  margin-top: 16px;
 }
 
 .suggestion-pill {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-pill);
-  padding: 7px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 8px 16px;
   font-family: var(--font-body);
   font-size: 13px;
   color: var(--text-mid);
   cursor: pointer;
   outline: none;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+  transition: all 0.2s ease;
 }
 
 .suggestion-pill:hover {
-  background-color: rgba(156, 255, 107, 0.04);
-  border-color: rgba(156, 255, 107, 0.4);
+  border-color: rgba(127, 255, 60, 0.4);
   color: var(--text-hi);
-  box-shadow: 0 0 12px rgba(156, 255, 107, 0.1);
-}
-
-.suggestion-pill:focus-visible {
-  border-color: var(--green);
-}
-
-.suggestion-pill:active {
-  transform: scale(0.96);
+  background: rgba(127, 255, 60, 0.06);
 }
 
 .suggestion-pill.pill-active {
-  background-color: var(--green);
+  background: var(--green);
   border-color: var(--green);
-  color: var(--bg);
+  color: #0F1A08;
   font-weight: 600;
-  box-shadow: 0 0 16px rgba(156, 255, 107, 0.2);
 }
 
 /* choice step panels */

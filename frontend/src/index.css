@@ -240,7 +240,13 @@ body {
   width: 100%;
   max-width: var(--max-w);
   margin: 0 auto;
-  padding: 0 var(--pad-x);
+  padding: 0 48px;
+}
+
+@media (max-width: 600px) {
+  .content-col {
+    padding: 0 24px;
+  }
 }
 
 /* ============================================================
@@ -408,11 +414,11 @@ body {
 
 .onboarding-grid {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: clamp(48px, 6vw, 96px);
+  grid-template-columns: 48% 52%;
+  gap: 64px;
   align-items: center;
   width: 100%;
-  min-height: calc(100vh - var(--navbar-h) - 48px);
+  min-height: calc(100vh - var(--navbar-h) - 52px);
   padding: 48px 0;
 }
 
@@ -445,7 +451,7 @@ body {
   width: 100%;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 960px) {
   .onboarding-grid {
     grid-template-columns: 1fr;
     gap: 48px;

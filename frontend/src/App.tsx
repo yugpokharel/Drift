@@ -553,8 +553,11 @@ export default function App() {
         <div className="nav-inner">
           <button className="nav-wordmark" onClick={() => setCurrentPage('home')}>drift</button>
           <div className="nav-links">
-            <button className="nav-link" onClick={() => setCurrentPage('progress')}>Progress</button>
-            <a href="https://github.com/yugpokharel/Drift" target="_blank" rel="noreferrer" className="nav-link">GitHub</a>
+            <button
+              className={`nav-link${currentPage === 'progress' ? ' active' : ''}`}
+              onClick={() => setCurrentPage('progress')}
+            >Progress</button>
+            <a href="https://github.com/yugpokharel/Drift" target="_blank" rel="noreferrer" className="nav-link">GitHub ↗</a>
           </div>
         </div>
       </nav>
@@ -614,20 +617,21 @@ export default function App() {
                     {driftStep !== 'support' && driftStep !== 'auth-prompt' && (
                       <div className="onboarding-left fade-up">
                         <div className="hero-section">
-                          <p className="hero-eyebrow">Cognitive bandwidth tool</p>
+                          <p className="hero-eyebrow">
+                            <span className="hero-eyebrow-dot" />
+                            digital wellbeing · mood tracking
+                          </p>
                           <h1 className="hero-headline">what can your brain actually handle right now?</h1>
-                          <p className="hero-subline">not what you like — what you can actually absorb tonight.</p>
+                          <p className="hero-subline">not what you like. what you can actually take on right now — based on your real cognitive state.</p>
                           <hr className="hero-divider" />
-                          <div className="hero-quote">
-                            <p className="hero-quote-text">
-                              "The greater the number of choices, the greater the suffering induced by trying to choose."
-                            </p>
-                            <div className="hero-quote-attr">— on the paradox of choice</div>
-                          </div>
+                          <p className="hero-quote-text">
+                            "The greater the number of choices, the greater the suffering induced by trying to choose."
+                          </p>
+                          <p className="hero-quote-attr">— on the paradox of choice</p>
                           <div className="hero-pills">
-                            <span className="hero-pill">Mood-aware</span>
-                            <span className="hero-pill">No sign-up needed</span>
-                            <span className="hero-pill">Instant results</span>
+                            <span className="hero-pill">📺  tv shows</span>
+                            <span className="hero-pill">🎵  music</span>
+                            <span className="hero-pill">🎬  movies</span>
                           </div>
                         </div>
                       </div>
@@ -653,11 +657,11 @@ export default function App() {
                           {driftStep === 'mood' && (
                             <div className="step-slide fade-up">
                               <div className="prompt-box-card">
-                                <label className="prompt-label">How are you feeling right now?</label>
+                                <label className="prompt-label">how's it going, really</label>
                                 <textarea
                                   value={text}
                                   onChange={(e) => setText(e.target.value)}
-                                  placeholder="how's it going, really"
+                                  placeholder="tired, brain is mush... or actually feeling good"
                                   className="mood-textarea"
                                   maxLength={500}
                                 />
@@ -669,9 +673,8 @@ export default function App() {
                                     className="send-btn"
                                     aria-label="Send mood input"
                                   >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                      <line x1="22" y1="2" x2="11" y2="13"></line>
-                                      <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <path d="M5 12h14M12 5l7 7-7 7"/>
                                     </svg>
                                   </button>
                                 </div>
@@ -685,7 +688,7 @@ export default function App() {
                                     className={`suggestion-pill ${activePillIdx === idx ? 'pill-active' : ''}`}
                                     type="button"
                                   >
-                                    {s.label}
+                                    {s.label.toLowerCase()}
                                   </button>
                                 ))}
                               </div>
@@ -740,40 +743,32 @@ export default function App() {
                           {/* Step 2: Time Available */}
                           {driftStep === 'time' && (
                             <div className="step-slide fade-up">
-                              <h2 className="step-question">how much time do you have to spare?</h2>
+                              <h2 className="step-question">how much time do you have?</h2>
                               <div className="step-grid">
                                 <div
                                   className={`choice-card ${timeAvailable === 'short' ? 'selected' : ''}`}
-                                  onClick={() => {
-                                    setTimeAvailable('short');
-                                    setDriftStep('energy');
-                                  }}
+                                  onClick={() => { setTimeAvailable('short'); setDriftStep('energy'); }}
                                 >
-                                  <div className="choice-title">A few minutes</div>
-                                  <div className="choice-desc">Under 30 mins</div>
+                                  <div className="choice-title">a few minutes</div>
+                                  <div className="choice-desc">Just killing time</div>
                                 </div>
-
                                 <div
                                   className={`choice-card ${timeAvailable === 'medium' ? 'selected' : ''}`}
-                                  onClick={() => {
-                                    setTimeAvailable('medium');
-                                    setDriftStep('energy');
-                                  }}
+                                  onClick={() => { setTimeAvailable('medium'); setDriftStep('energy'); }}
                                 >
-                                  <div className="choice-title">An episode or two</div>
-                                  <div className="choice-desc">30 to 90 mins</div>
+                                  <div className="choice-title">an episode or two</div>
+                                  <div className="choice-desc">30–50 min</div>
                                 </div>
-
                                 <div
                                   className={`choice-card ${timeAvailable === 'long' ? 'selected' : ''}`}
-                                  onClick={() => {
-                                    setTimeAvailable('long');
-                                    setDriftStep('energy');
-                                  }}
+                                  onClick={() => { setTimeAvailable('long'); setDriftStep('energy'); }}
                                 >
-                                  <div className="choice-title">The whole evening</div>
-                                  <div className="choice-desc">Several hours</div>
+                                  <div className="choice-title">the whole evening</div>
+                                  <div className="choice-desc">could binge</div>
                                 </div>
+                              </div>
+                              <div className="wizard-buttons">
+                                <button className="back-btn" onClick={() => setDriftStep('mood')}>← back</button>
                               </div>
                             </div>
                           )}
@@ -781,31 +776,32 @@ export default function App() {
                           {/* Step 3: Energy Level */}
                           {driftStep === 'energy' && (
                             <div className="step-slide fade-up">
-                              <h2 className="step-question">what is your cognitive energy like?</h2>
+                              <h2 className="step-question">energy to focus?</h2>
                               <div className="step-grid">
                                 <div
                                   className={`choice-card ${energyLevel === 'low' ? 'selected' : ''}`}
                                   onClick={() => handleEnergySelect('low')}
                                 >
-                                  <div className="choice-title">Basically none</div>
-                                  <div className="choice-desc">Exhausted, resting</div>
+                                  <div className="choice-title">basically none</div>
+                                  <div className="choice-desc">don't make me think</div>
                                 </div>
-
                                 <div
                                   className={`choice-card ${energyLevel === 'mid' ? 'selected' : ''}`}
                                   onClick={() => handleEnergySelect('mid')}
                                 >
-                                  <div className="choice-title">Some</div>
-                                  <div className="choice-desc">Typical attention</div>
+                                  <div className="choice-title">some</div>
+                                  <div className="choice-desc">can follow a plot</div>
                                 </div>
-
                                 <div
                                   className={`choice-card ${energyLevel === 'high' ? 'selected' : ''}`}
                                   onClick={() => handleEnergySelect('high')}
                                 >
-                                  <div className="choice-title">Plenty</div>
-                                  <div className="choice-desc">Focused, energetic</div>
+                                  <div className="choice-title">plenty</div>
+                                  <div className="choice-desc">give me something dense</div>
                                 </div>
+                              </div>
+                              <div className="wizard-buttons">
+                                <button className="back-btn" onClick={() => setDriftStep('time')}>← back</button>
                               </div>
                             </div>
                           )}
@@ -823,105 +819,95 @@ export default function App() {
                     {/* 1. Horizontal State Band */}
                     <div className="state-band fade-up">
                       <div className="state-band-left">
-                        <p className="state-eyebrow">Your cognitive snapshot</p>
+                        <p className="state-eyebrow">estimated cognitive state</p>
                         <div className="state-bucket-name">{getBucketName(userState.attentionCapacity)}</div>
-                        <div className="state-descriptor">estimated from your mood, energy, and time — not a real biometric reading.</div>
+                        <div className="state-descriptor">
+                          {userState.attentionCapacity < 35
+                            ? 'your brain needs easy tonight'
+                            : userState.attentionCapacity < 70
+                            ? 'enough left for a real story'
+                            : 'you can handle the dense stuff'}
+                        </div>
                       </div>
                       
                       <div className="state-band-right">
                         <div className="state-gauge-item">
-                          <span className="gauge-label">Stress</span>
+                          <span className="gauge-label">stress</span>
                           <div className="gauge-track">
-                            <div
-                              className="gauge-fill-bar bar-stress"
-                              style={{ width: animateGauges ? `${userState.stressLevel}%` : '0%' }}
-                            />
+                            <div className="gauge-fill-bar bar-stress" style={{ width: animateGauges ? `${userState.stressLevel}%` : '0%' }} />
                           </div>
-                          <div className="gauge-value">{userState.stressLevel}%</div>
+                          <div className="gauge-value">{userState.stressLevel}</div>
                         </div>
-
                         <div className="state-gauge-item">
-                          <span className="gauge-label">Calm</span>
+                          <span className="gauge-label">calm</span>
                           <div className="gauge-track">
-                            <div
-                              className="gauge-fill-bar bar-calm"
-                              style={{ width: animateGauges ? `${userState.calmLevel}%` : '0%' }}
-                            />
+                            <div className="gauge-fill-bar bar-calm" style={{ width: animateGauges ? `${userState.calmLevel}%` : '0%' }} />
                           </div>
-                          <div className="gauge-value">{userState.calmLevel}%</div>
+                          <div className="gauge-value">{userState.calmLevel}</div>
                         </div>
-
                         <div className="state-gauge-item">
-                          <span className="gauge-label">Attention</span>
+                          <span className="gauge-label">attention</span>
                           <div className="gauge-track">
-                            <div
-                              className="gauge-fill-bar bar-attention"
-                              style={{ width: animateGauges ? `${userState.attentionCapacity}%` : '0%' }}
-                            />
+                            <div className="gauge-fill-bar bar-attention" style={{ width: animateGauges ? `${userState.attentionCapacity}%` : '0%' }} />
                           </div>
-                          <div className="gauge-value">{userState.attentionCapacity}%</div>
+                          <div className="gauge-value">{userState.attentionCapacity}</div>
                         </div>
                       </div>
+                      <p className="state-disclaimer">estimated from your text input — not a real biometric reading</p>
                     </div>
 
                     {/* 2. Headline & Subline */}
                     <div className="results-section-head fade-up">
-                      <h1 className="results-headline">here's what fits tonight</h1>
-                      <p className="results-subline">one pick per category, matched to where you're at</p>
+                      <h1 className="results-headline">here's what fits</h1>
+                      <p className="results-subline">one pick per category · matched to your state right now</p>
                     </div>
 
                     {/* 3. Three recommendation cards in Bento Grid */}
                     <div className="bento-grid">
-                      
-                      {/* TV Show - HERO PICK */}
+                      {/* TV Show — hero tall-left card */}
                       <div className="bento-hero card-stagger-1">
                         <div className="recommendation-card">
-                          <div className="category-label">TV Show</div>
+                          <div className="category-label">📺 tv show</div>
                           <h2 className="item-title">{recommendations.tv_show.title}</h2>
                           <p className="item-description">{recommendations.tv_show.extraInfo}</p>
                           <div className="item-tags-row">
-                            {renderTagBadge('Stress', recommendations.tv_show.stress)}
-                            {renderTagBadge('Calm', recommendations.tv_show.calm)}
-                            {renderTagBadge('Attention', recommendations.tv_show.attention)}
+                            {renderTagBadge('stress', recommendations.tv_show.stress)}
+                            {renderTagBadge('calm', recommendations.tv_show.calm)}
+                            {renderTagBadge('attention', recommendations.tv_show.attention)}
                           </div>
                         </div>
                       </div>
-
-                      {/* Movie - SECONDARY */}
+                      {/* Music — top-right */}
                       <div className="bento-secondary card-stagger-2">
                         <div className="recommendation-card">
-                          <div className="category-label">Movie</div>
-                          <h2 className="item-title">{recommendations.movie.title}</h2>
-                          <p className="item-description">{recommendations.movie.extraInfo}</p>
-                          <div className="item-tags-row">
-                            {renderTagBadge('Stress', recommendations.movie.stress)}
-                            {renderTagBadge('Calm', recommendations.movie.calm)}
-                            {renderTagBadge('Attention', recommendations.movie.attention)}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Music - SECONDARY */}
-                      <div className="bento-secondary card-stagger-3">
-                        <div className="recommendation-card">
-                          <div className="category-label">Music</div>
+                          <div className="category-label">🎵 music</div>
                           <h2 className="item-title">{recommendations.music.title}</h2>
                           <p className="item-description">{recommendations.music.extraInfo}</p>
                           <div className="item-tags-row">
-                            {renderTagBadge('Stress', recommendations.music.stress)}
-                            {renderTagBadge('Calm', recommendations.music.calm)}
-                            {renderTagBadge('Attention', recommendations.music.attention)}
+                            {renderTagBadge('stress', recommendations.music.stress)}
+                            {renderTagBadge('calm', recommendations.music.calm)}
+                            {renderTagBadge('attention', recommendations.music.attention)}
                           </div>
                         </div>
                       </div>
-
+                      {/* Movie — bottom-right */}
+                      <div className="bento-secondary card-stagger-3">
+                        <div className="recommendation-card">
+                          <div className="category-label">🎬 movie</div>
+                          <h2 className="item-title">{recommendations.movie.title}</h2>
+                          <p className="item-description">{recommendations.movie.extraInfo}</p>
+                          <div className="item-tags-row">
+                            {renderTagBadge('stress', recommendations.movie.stress)}
+                            {renderTagBadge('calm', recommendations.movie.calm)}
+                            {renderTagBadge('attention', recommendations.movie.attention)}
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     {/* 4. Ask again button */}
                     <div className="ask-again-wrapper fade-up">
-                      <button onClick={handleReset} className="ask-again-btn">
-                        Ask again
-                      </button>
+                      <button onClick={handleReset} className="ask-again-btn">start over</button>
                     </div>
 
                   </div>
@@ -932,11 +918,11 @@ export default function App() {
         </div>
 
         {/* Global Footer (Screen 1 only) */}
-        {driftStep !== 'results' && !isLoading && (
+        {currentPage === 'home' && driftStep !== 'results' && !isLoading && (
           <footer className="site-footer">
             <div className="footer-inner">
-              <span className="footer-text">Antigravity Agent · 2026</span>
-              <span className="footer-text">built with Node.js + Express</span>
+              <span className="footer-text">drift · final year project · 2025</span>
+              <span className="footer-text">node.js · express · mongodb · onnx</span>
             </div>
           </footer>
         )}

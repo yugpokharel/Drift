@@ -8,6 +8,8 @@ import { fetchTMDBRecommendations } from './services/tmdbService.js';
 import { fetchLastFMTrack } from './services/lastfmService.js';
 import { connectDB } from './db.js';
 import sessionRouter from './routes/sessionRoutes.js';
+import { getHybridRecommendation } from './services/recommenderService.js';
+
 
 dotenv.config();
 
@@ -118,6 +120,43 @@ app.post('/api/recommendations', async (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({ status: 'healthy', time: new Date().toISOString() });
 });
+
+/**
+ * Endpoint 4: Hybrid movie recommendation
+ * POST /api/recommend
+ *
+ * Body:
+ *   userId?          – numeric MovieLens userId (optional; uses popularity fallback if absent)
+ *   moodText?        – raw free-text mood description
+ *   moodLabel?       – pre-classified label from /api/mood (sadness|joy|anger|fear|...)
+ *   attentionCapacity? – 0–100 slider value
+ *   tone?            – "comfort" | "stimulation" | "escapism"
+ *   context?         – "alone" | "background" | "focused"
+ *
+ * Returns one movie with title, overview, genres, IMDb/RT ratings, and a
+ * natural-language "why this pick" explanation.
+ */
+app.post('/api/recommend', async (req, res) => {
+  const { userId, moodText, moodLabel, attentionCapacity, tone, context } = req.body;
+
+  try {
+    const result = await getHybridRecommendation(
+      typeof userId === 'number' ? userId : undefined,
+      { moodText, moodLabel, attentionCapacity, tone, context },
+    );
+
+    if (!result) {
+      res.status(503).json({ error: 'Hybrid recommender assets not available. Run the training pipeline first.' });
+      return;
+    }
+
+    res.json(result);
+  } catch (error: any) {
+    console.error('[/api/recommend]', error.message);
+    res.status(500).json({ error: error.message || 'Hybrid recommendation failed.' });
+  }
+});
+
 
 // Connect to MongoDB then start server
 (async () => {

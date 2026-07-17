@@ -229,6 +229,8 @@ def main():
             "movieId": int(actual_mid)
         })
         
+    popularity_fallback = [{"movieId": int(idx_to_movie[idx]), "score": 1.0 - (i / 100.0)} for i, idx in enumerate(popular_item_indices[:50])]
+    
     output_data = {
         "stats": {
             "initial_ratings": initial_ratings_count,
@@ -244,7 +246,8 @@ def main():
         },
         "candidates": candidates_export,
         "needed_movies": needed_movies_metadata,
-        "test_set": test_set_export
+        "test_set": test_set_export,
+        "popularity_fallback": popularity_fallback
     }
     
     output_dir = "src/data"

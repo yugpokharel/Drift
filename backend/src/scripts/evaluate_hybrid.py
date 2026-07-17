@@ -309,17 +309,34 @@ Every (user, movie) interaction was mapped to a synthetic context vector using a
         f.write(report_content)
     print("Saved report to recommender_report.md")
     
-    # Export deployment assets
+    # Export deployment assets (optimized for size: only keep the 300 test users and their relevant movies)
+    test_uids = {str(q["userId"]) for q in test_queries}
+    pruned_candidates = {uid: cands for uid, cands in candidates.items() if uid in test_uids}
+    
+    # Collect all movieIds actually referenced in pruned candidates
+    referenced_mids = set()
+    for cands in pruned_candidates.values():
+        for c in cands:
+            referenced_mids.add(str(c["movieId"]))
+            
+    # Include popularity fallback candidates
+    popularity_fallback = cf_data.get("popularity_fallback", [])
+    for c in popularity_fallback:
+        referenced_mids.add(str(c["movieId"]))
+        
+    pruned_movie_features = {mid: feats for mid, feats in movie_features.items() if mid in referenced_mids}
+    
     deployment_assets = {
         "alpha": best_alpha,
         "genres": ALL_GENRES,
-        "movie_features": movie_features,
-        "candidates": candidates
+        "movie_features": pruned_movie_features,
+        "candidates": pruned_candidates,
+        "popularity_fallback": popularity_fallback
     }
     
     with open("src/data/recommender_assets.json", "w") as f:
         json.dump(deployment_assets, f)
-    print("Saved deployment assets to src/data/recommender_assets.json")
+    print(f"Saved optimized deployment assets ({len(pruned_candidates)} users, {len(pruned_movie_features)} movies) to src/data/recommender_assets.json")
     print("Step 3 completed successfully.")
 
 if __name__ == "__main__":

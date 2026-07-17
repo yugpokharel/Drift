@@ -16,7 +16,9 @@ interface ContentItem {
   stress: '-' | 'neutral' | '+';
   calm: '-' | 'neutral' | '+';
   attention: '-' | 'neutral' | '+';
+  whyThisPick?: string;
 }
+
 
 interface Recommendations {
   tv_show: ContentItem;
@@ -294,8 +296,9 @@ export default function App() {
       const recsResponse = await fetch(`${API_BASE}/recommendations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userState: stateData })
+        body: JSON.stringify({ userState: stateData, moodText: text, moodLabel: mood })
       });
+
 
       if (!recsResponse.ok) {
         throw new Error('Failed to retrieve recommendations.');
@@ -896,6 +899,17 @@ export default function App() {
                           <div className="category-label">🎬 movie</div>
                           <h2 className="item-title">{recommendations.movie.title}</h2>
                           <p className="item-description">{recommendations.movie.extraInfo}</p>
+                          {recommendations.movie.whyThisPick && (
+                            <p className="item-why" style={{
+                              marginTop: '0.6rem',
+                              fontSize: '0.78rem',
+                              color: 'var(--text-2)',
+                              fontStyle: 'italic',
+                              lineHeight: 1.4,
+                              borderTop: '1px solid rgba(255,255,255,0.07)',
+                              paddingTop: '0.5rem',
+                            }}>{recommendations.movie.whyThisPick}</p>
+                          )}
                           <div className="item-tags-row">
                             {renderTagBadge('stress', recommendations.movie.stress)}
                             {renderTagBadge('calm', recommendations.movie.calm)}

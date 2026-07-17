@@ -366,7 +366,7 @@ export default function App() {
       const recsResponse = await fetch(`${API_BASE}/recommendations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userState: stateData })
+        body: JSON.stringify({ userState: stateData, moodText: text, moodLabel: mood })
       });
       if (!recsResponse.ok) throw new Error('Failed to retrieve recommendations.');
       const recsData: Recommendations = await recsResponse.json();

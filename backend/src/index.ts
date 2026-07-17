@@ -71,8 +71,9 @@ app.post('/api/state', (req, res) => {
 });
 
 // Endpoint 3: Match user-state to live TMDB + Last.fm recommendations (seed-data fallback)
+// The movie slot is additionally enriched by the hybrid ALS + sentence-embedding recommender.
 app.post('/api/recommendations', async (req, res) => {
-  const { userState } = req.body;
+  const { userState, moodText, moodLabel } = req.body;
 
   if (!userState ||
       typeof userState.stressLevel !== 'number' ||
@@ -84,11 +85,26 @@ app.post('/api/recommendations', async (req, res) => {
     return;
   }
 
+  // Derive tone/context from userState for the hybrid recommender
+  const hybridTone = userState.stressLevel > 60 ? 'comfort'
+    : userState.attentionCapacity > 65 ? 'stimulation'
+    : 'escapism';
+  const hybridContext = userState.attentionCapacity < 35 ? 'background'
+    : userState.attentionCapacity > 65 ? 'focused'
+    : 'alone';
+
   try {
-    // Attempt live API calls in parallel
-    const [liveMedia, liveMusic] = await Promise.allSettled([
+    // Fire all data sources in parallel
+    const [liveMedia, liveMusic, hybridResult] = await Promise.allSettled([
       fetchTMDBRecommendations(userState),
-      fetchLastFMTrack(userState)
+      fetchLastFMTrack(userState),
+      getHybridRecommendation(undefined, {
+        moodText,
+        moodLabel,
+        attentionCapacity: userState.attentionCapacity,
+        tone: hybridTone,
+        context: hybridContext,
+      }),
     ]);
 
     // Seed-data fallback for any category that fails
@@ -96,10 +112,25 @@ app.post('/api/recommendations', async (req, res) => {
 
     const tmdbResult = liveMedia.status === 'fulfilled' ? liveMedia.value : null;
     const lastfmResult = liveMusic.status === 'fulfilled' ? liveMusic.value : null;
+    const hybrid = hybridResult.status === 'fulfilled' ? hybridResult.value : null;
 
-    const movie = (tmdbResult?.movie)
-      ? { ...seedFallback.movie, title: tmdbResult.movie.title, extraInfo: tmdbResult.movie.extraInfo }
-      : seedFallback.movie;
+    // Movie: hybrid (ALS + mood) > TMDB > seed fallback
+    let movie: any;
+    if (hybrid) {
+      movie = {
+        ...seedFallback.movie,
+        title: hybrid.title,
+        extraInfo: hybrid.overview,
+        genres: hybrid.genres,
+        imdbRating: hybrid.imdbRating,
+        rottenTomatoes: hybrid.rottenTomatoes,
+        whyThisPick: hybrid.whyThisPick,
+      };
+    } else if (tmdbResult?.movie) {
+      movie = { ...seedFallback.movie, title: tmdbResult.movie.title, extraInfo: tmdbResult.movie.extraInfo };
+    } else {
+      movie = seedFallback.movie;
+    }
 
     const tv_show = (tmdbResult?.tv_show)
       ? { ...seedFallback.tv_show, title: tmdbResult.tv_show.title, extraInfo: tmdbResult.tv_show.extraInfo }
@@ -109,10 +140,11 @@ app.post('/api/recommendations', async (req, res) => {
       ? { ...seedFallback.music, title: lastfmResult.title, extraInfo: lastfmResult.extraInfo }
       : seedFallback.music;
 
-    console.log(`[Recommendations] TMDB: ${tmdbResult ? 'live' : 'fallback'} | LastFM: ${lastfmResult ? 'live' : 'fallback'}`);
+    console.log(`[Recommendations] Hybrid: ${hybrid ? 'live' : 'fallback'} | TMDB: ${tmdbResult ? 'live' : 'fallback'} | LastFM: ${lastfmResult ? 'live' : 'fallback'}`);
     res.json({ movie, tv_show, music });
   } catch (error: any) {
     res.status(500).json({ error: error.message || 'Error getting recommendations' });
+
   }
 });
 

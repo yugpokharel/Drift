@@ -89,10 +89,20 @@ const movieVectors: Map<number, Float32Array> = new Map();
 function loadAssets() {
   if (assets) return;
 
-  const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  const assetPath = path.resolve(__dirname, '../../data/recommender_assets.json');
+  // Resolve asset file regardless of whether running in dev (tsx from src/)
+  // or production (node from dist/). Walk up candidate paths.
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname  = path.dirname(__filename);
 
-  if (!fs.existsSync(assetPath)) {
+  const candidates = [
+    path.resolve(__dirname, '../data/recommender_assets.json'),        // dev: src/data/
+    path.resolve(__dirname, '../../data/recommender_assets.json'),     // prod: dist/data/ (if copied)
+    path.resolve(__dirname, '../../src/data/recommender_assets.json'), // prod fallback to src
+  ];
+
+  const assetPath = candidates.find(p => fs.existsSync(p));
+
+  if (!assetPath) {
     console.warn('[Recommender] recommender_assets.json not found — hybrid mode disabled.');
     return;
   }
@@ -116,6 +126,7 @@ function loadAssets() {
   } catch (err: any) {
     console.error('[Recommender] Failed to load assets:', err.message);
   }
+
 }
 
 // ─── Vector helpers ───────────────────────────────────────────────────────────
@@ -265,18 +276,37 @@ function applyContextBoosts(vec: Float32Array, context: string) {
   }
 }
 
-// ─── OMDb enrichment (optional, rate-limited) ─────────────────────────────────
-
-async function fetchOMDbDetails(imdbId: string): Promise<{ imdbRating: string; rottenTomatoes: string }> {
+/**
+ * Look up IMDb rating + Rotten Tomatoes score from OMDb using title + year.
+ * The OMDb API accepts ?t=<title>&y=<year> which avoids needing an IMDb ID.
+ * Falls back to 'N/A' on any error (OMDB_API_KEY env var must be set).
+ */
+async function fetchOMDbDetails(
+  title: string,
+  releaseDate: string,
+): Promise<{ imdbRating: string; rottenTomatoes: string }> {
   const apiKey = process.env.OMDB_API_KEY;
   if (!apiKey) return { imdbRating: 'N/A', rottenTomatoes: 'N/A' };
 
+  // Extract year from MovieLens title format "Movie Name (YYYY)" or from releaseDate
+  const yearFromTitle = title.match(/\((\d{4})\)$/);
+  const year = yearFromTitle ? yearFromTitle[1]
+    : releaseDate ? releaseDate.slice(0, 4)
+    : '';
+
+  // Strip the year suffix from the title before querying
+  const cleanTitle = title.replace(/\s*\(\d{4}\)$/, '').trim();
+
   try {
-    const url = `https://www.omdbapi.com/?i=tt${imdbId}&apikey=${apiKey}`;
+    const params = new URLSearchParams({ t: cleanTitle, apikey: apiKey });
+    if (year) params.set('y', year);
+    const url = `https://www.omdbapi.com/?${params.toString()}`;
     const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
     if (!res.ok) return { imdbRating: 'N/A', rottenTomatoes: 'N/A' };
 
     const data: any = await res.json();
+    if (data.Response === 'False') return { imdbRating: 'N/A', rottenTomatoes: 'N/A' };
+
     const imdbRating = data.imdbRating ?? 'N/A';
     const rt = (data.Ratings ?? []).find((r: any) => r.Source === 'Rotten Tomatoes');
     return { imdbRating, rottenTomatoes: rt?.Value ?? 'N/A' };
@@ -284,6 +314,7 @@ async function fetchOMDbDetails(imdbId: string): Promise<{ imdbRating: string; r
     return { imdbRating: 'N/A', rottenTomatoes: 'N/A' };
   }
 }
+
 
 // ─── Why-this-pick explanation ────────────────────────────────────────────────
 
@@ -370,8 +401,12 @@ export async function getHybridRecommendation(
 
   if (!topFeature) return null;
 
-  // 6. OMDb enrichment (best-effort, no blocking)
-  const { imdbRating, rottenTomatoes } = await fetchOMDbDetails('0000000');
+  // 6. OMDb enrichment (best-effort, non-blocking — gracefully returns N/A if key absent)
+  const { imdbRating, rottenTomatoes } = await fetchOMDbDetails(
+    topFeature.title,
+    topFeature.releaseDate,
+  );
+
 
   // 7. Build response
   return {

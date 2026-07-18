@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.css';
 import Progress from './Progress';
 
@@ -17,8 +17,10 @@ interface ContentItem {
   calm: '-' | 'neutral' | '+';
   attention: '-' | 'neutral' | '+';
   whyThisPick?: string;
+  imdbRating?: string;
+  rottenTomatoes?: string;
+  genres?: string[];
 }
-
 
 interface Recommendations {
   tv_show: ContentItem;
@@ -26,8 +28,8 @@ interface Recommendations {
   music: ContentItem;
 }
 
-type Tab = 'drift' | 'focus' | 'habits' | 'profile' | 'about';
-type DriftStep = 'mood' | 'auth-prompt' | 'support' | 'time' | 'energy' | 'results';
+type Tab = 'home' | 'progress' | 'about' | 'soundscapes' | 'profile';
+type DriftStep = 'input' | 'support' | 'auth-prompt' | 'results';
 type AuthStep = 'login' | 'signup' | 'forgot' | 'dashboard';
 type BreathState = 'idle' | 'inhale' | 'hold' | 'exhale';
 
@@ -44,27 +46,176 @@ const WELLNESS_FACTS = [
   "The Zeigarnik Effect states that humans remember uncompleted tasks better than completed ones, which is why open tabs cause mental clutter."
 ];
 
+// WebGL Background Shader Canvas Component
+function WebGLBackground() {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
+    if (!gl) return;
+
+    const vs = `
+      attribute vec2 a_position;
+      varying vec2 v_texCoord;
+      void main() {
+        v_texCoord = a_position * 0.5 + 0.5;
+        gl_Position = vec4(a_position, 0.0, 1.0);
+      }
+    `;
+
+    const fs = `
+      precision highp float;
+      uniform float u_time;
+      uniform vec2 u_resolution;
+      uniform vec2 u_mouse;
+      varying vec2 v_texCoord;
+
+      void main() {
+          vec2 uv = v_texCoord;
+          
+          // Flowing waves
+          for(float i = 1.0; i < 4.0; i++) {
+              uv.y += sin(uv.x * 3.0 * i + u_time * 0.4) * 0.08 / i;
+              uv.x += cos(uv.y * 2.0 * i + u_time * 0.2) * 0.04 / i;
+          }
+          
+          // Drift Palette colors
+          vec3 baseColor = vec3(0.05, 0.08, 0.12); // Deep Indigo (#0A0E1A)
+          vec3 teal = vec3(0.52, 0.85, 0.82);     // Soft Teal (#88D8D0)
+          vec3 lavender = vec3(0.70, 0.65, 0.84);  // Lavender (#B4A7D6)
+          
+          // Hover distortion based on mouse position
+          vec2 mouseUV = u_mouse / u_resolution;
+          float dist = distance(v_texCoord, mouseUV);
+          float hoverGlow = smoothstep(0.3, 0.0, dist) * 0.03;
+          
+          float mixVal = smoothstep(0.2, 0.8, uv.y + sin(u_time * 0.15) * 0.1);
+          vec3 waveColor = mix(baseColor, mix(teal, lavender, sin(u_time * 0.3) * 0.5 + 0.5), mixVal);
+          vec3 finalColor = waveColor + vec3(hoverGlow * 0.5, hoverGlow, hoverGlow * 0.8);
+          
+          gl_FragColor = vec4(finalColor, 1.0);
+      }
+    `;
+
+    const compileShader = (type: number, source: string) => {
+      const shader = gl.createShader(type);
+      if (!shader) return null;
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error('Shader compilation error:', gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+      }
+      return shader;
+    };
+
+    const vertexShader = compileShader(gl.VERTEX_SHADER, vs);
+    const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fs);
+    if (!vertexShader || !fragmentShader) return;
+
+    const program = gl.createProgram();
+    if (!program) return;
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.error('Program linking error:', gl.getProgramInfoLog(program));
+      return;
+    }
+    gl.useProgram(program);
+
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+
+    const positionLoc = gl.getAttribLocation(program, 'a_position');
+    gl.enableVertexAttribArray(positionLoc);
+    gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
+
+    const uTime = gl.getUniformLocation(program, 'u_time');
+    const uRes = gl.getUniformLocation(program, 'u_resolution');
+    const uMouse = gl.getUniformLocation(program, 'u_mouse');
+
+    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = rect.height - (e.clientY - rect.top);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+
+    let animationFrameId: number;
+    const resizeCanvas = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+        gl.viewport(0, 0, w, h);
+      }
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const render = (time: number) => {
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform1f(uTime, time * 0.001);
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.uniform2f(uMouse, mouse.x, mouse.y);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render(0);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('resize', resizeCanvas);
+      gl.deleteBuffer(buffer);
+      gl.deleteProgram(program);
+      gl.deleteShader(vertexShader);
+      gl.deleteShader(fragmentShader);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 w-full h-full z-0 pointer-events-none opacity-40"
+    />
+  );
+}
+
 export default function App() {
   // Navigation & Core States
-  const [activeTab, setActiveTab] = useState<Tab>('drift');
-  const [currentPage, setCurrentPage] = useState<'home' | 'progress'>('home');
+  const [activeTab, setActiveTab] = useState<Tab>('home');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   
-  // Drift Flow States
-  const [driftStep, setDriftStep] = useState<DriftStep>('mood');
+  // Onboarding / Input Form States
+  const [driftStep, setDriftStep] = useState<DriftStep>('input');
   const [text, setText] = useState('');
+  const [attentionVal, setAttentionVal] = useState(50);
+  const [selectedContext, setSelectedContext] = useState<'ALONE' | 'WITH OTHERS' | 'BACKGROUND WATCH' | 'FULLY FOCUSED'>('ALONE');
   const [mood, setMood] = useState('neutral');
-  const [timeAvailable, setTimeAvailable] = useState<'short' | 'medium' | 'long' | null>(null);
-  const [energyLevel, setEnergyLevel] = useState<'low' | 'mid' | 'high' | null>(null);
+  
+  // Computed States & Outputs
   const [userState, setUserState] = useState<UserState | null>(null);
   const [recommendations, setRecommendations] = useState<Recommendations | null>(null);
   
-  // App Loading / Error States
+  // Loading & Error states
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentFact, setCurrentFact] = useState('');
+  const [messageIdx, setMessageIdx] = useState(0);
+  const [dialOffset, setDialOffset] = useState(502.65);
 
   // Auth Form States
   const [authStep, setAuthStep] = useState<AuthStep>('login');
@@ -76,25 +227,25 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Focus Mode States
-  const [isFocusMode, setIsFocusMode] = useState(false);
+  // Focus Timer States
   const [focusTimeLeft, setFocusTimeLeft] = useState(1500); // 25 mins
   const [isFocusRunning, setIsFocusRunning] = useState(false);
+  
+  // Soundscapes playback states
+  const [playingSound, setPlayingSound] = useState<string | null>(null);
+  const [soundVolume, setSoundVolume] = useState(60);
+  const [isMuted, setIsMuted] = useState(true);
 
   // Breathing Exercise States
   const [breathState, setBreathState] = useState<BreathState>('idle');
   const [breathSeconds, setBreathSeconds] = useState(4);
 
-  // Grief support auto-advance countdown (3 seconds)
+  // Grief support countdown
   const [supportCountdown, setSupportCountdown] = useState(3);
-
-  // Redesign state hooks
+  
+  // Secondary redesign states
   const [animateGauges, setAnimateGauges] = useState(false);
-  const [dialOffset, setDialOffset] = useState(502.65);
-  const [messageIdx, setMessageIdx] = useState(0);
-  const [activePillIdx, setActivePillIdx] = useState<number | null>(null);
 
-  // Set initial random wellness fact
   useEffect(() => {
     setCurrentFact(WELLNESS_FACTS[Math.floor(Math.random() * WELLNESS_FACTS.length)]);
   }, [isLoading]);
@@ -125,34 +276,21 @@ export default function App() {
   }, [isLoading, userState]);
 
   const LOADING_MESSAGES = [
-    "aligning recommendations...",
-    "calibrating cognitive levels...",
-    "sifting content databases..."
+    "Reading your mood...",
+    "Calibrating cognitive levels...",
+    "Filtering the noise...",
+    "Almost there..."
   ];
 
-  // Cycle loading messages below the circular dial at 900ms interval
+  // Cycle loading messages below the circular dial at 1000ms interval
   useEffect(() => {
     if (isLoading) {
       const interval = setInterval(() => {
         setMessageIdx((prev) => (prev + 1) % LOADING_MESSAGES.length);
-      }, 900);
+      }, 1000);
       return () => clearInterval(interval);
     }
   }, [isLoading]);
-
-  const getBucketName = (capacity: number) => {
-    if (capacity < 35) return 'brain-fried';
-    if (capacity < 70) return 'relaxed';
-    return 'hyper-focused';
-  };
-
-  const handleSuggestionClick = (suggestionText: string, index: number) => {
-    setText(suggestionText);
-    setActivePillIdx(index);
-    setTimeout(() => {
-      setActivePillIdx(null);
-    }, 300);
-  };
 
   // Auto-advance from grief support screen after 3s — no choices presented
   useEffect(() => {
@@ -207,80 +345,63 @@ export default function App() {
     return () => clearInterval(interval);
   }, [breathState]);
 
-  // Suggestion pills
-  const suggestions = [
-    { text: 'exhausted from work', label: 'Exhausted' },
-    { text: 'feeling good, ready to relax', label: 'Feeling Good' },
-    { text: 'completely bored and restless', label: 'Bored' },
-    { text: 'stressed out and overwhelmed', label: 'Stressed' }
-  ];
-
-  // Trigger random wellness fact change
-  const triggerLoadingWithFact = (loadingState: boolean) => {
-    if (loadingState) {
-      setCurrentFact(WELLNESS_FACTS[Math.floor(Math.random() * WELLNESS_FACTS.length)]);
-    }
-    setIsLoading(loadingState);
+  const getBucketName = (capacity: number) => {
+    if (capacity < 35) return 'brain-fried';
+    if (capacity < 70) return 'relaxed';
+    return 'hyper-focused';
   };
 
-  // Submit Mood (Assess text)
-  const handleMoodSubmit = async () => {
-    if (!text.trim()) return;
-    triggerLoadingWithFact(true);
+  // Unified Search Execution calling multi-stage backend API
+  const handleExecuteSearch = async () => {
+    setIsLoading(true);
     setError(null);
 
+    // Derive energyLevel & timeAvailable based on slider & context selection
+    const derivedEnergy = attentionVal < 35 ? 'low' : attentionVal > 70 ? 'high' : 'mid';
+    let derivedTime: 'short' | 'medium' | 'long' = 'medium';
+    if (selectedContext === 'BACKGROUND WATCH' || selectedContext === 'WITH OTHERS') {
+      derivedTime = 'short';
+    } else if (selectedContext === 'FULLY FOCUSED') {
+      derivedTime = 'long';
+    }
+
     try {
-      const response = await fetch(`${API_BASE}/mood`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to classify mood. Please try again.');
+      // 1. Classify Mood
+      let classifiedMood = 'neutral';
+      if (text.trim()) {
+        const moodResponse = await fetch(`${API_BASE}/mood`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        if (moodResponse.ok) {
+          const moodData = await moodResponse.json();
+          classifiedMood = moodData.mood;
+          setMood(classifiedMood);
+        }
       }
-
-      const data = await response.json();
-      setMood(data.mood);
 
       // Check for sensitive or heavy grief keywords
       const HEAVY_KEYWORDS = [
         'died', 'death', 'lost', 'passed away', 'funeral', 'kill', 'suicide', 
         'depressed', 'grief', 'crying', 'broken', 'divorce', 'mourning', 'cancer', 'sick', 'accident'
       ];
-      const isHeavy = HEAVY_KEYWORDS.some(word => text.toLowerCase().includes(word)) || data.mood === 'sadness';
+      const isHeavy = HEAVY_KEYWORDS.some(word => text.toLowerCase().includes(word)) || classifiedMood === 'sadness';
 
       if (isHeavy) {
+        setIsLoading(false);
         setDriftStep('support');
-      } else if (!isLoggedIn) {
-        setDriftStep('auth-prompt');
-      } else {
-        setDriftStep('time');
+        return;
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred.');
-    } finally {
-      setTimeout(() => {
-        triggerLoadingWithFact(false);
-      }, 1200);
-    }
-  };
 
-  // Submit State and Recommendations
-  const handleEnergySelect = async (selectedEnergy: 'low' | 'mid' | 'high') => {
-    setEnergyLevel(selectedEnergy);
-    triggerLoadingWithFact(true);
-    setError(null);
-
-    try {
-      // 1. Get computed user state
+      // 2. Get Computed User State
       const stateResponse = await fetch(`${API_BASE}/state`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          mood,
-          timeAvailable,
-          energyLevel: selectedEnergy,
+          mood: classifiedMood,
+          timeAvailable: derivedTime,
+          energyLevel: derivedEnergy,
           hour: new Date().getHours()
         })
       });
@@ -290,15 +411,16 @@ export default function App() {
       }
 
       const stateData: UserState = await stateResponse.json();
+      // Ensure the computed state uses the user's manual slider input to override the attention heuristic
+      stateData.attentionCapacity = attentionVal;
       setUserState(stateData);
 
-      // 2. Get recommendations based on state
+      // 3. Retrieve Live / Hybrid Recommendations
       const recsResponse = await fetch(`${API_BASE}/recommendations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userState: stateData, moodText: text, moodLabel: mood })
+        body: JSON.stringify({ userState: stateData, moodText: text, moodLabel: classifiedMood })
       });
-
 
       if (!recsResponse.ok) {
         throw new Error('Failed to retrieve recommendations.');
@@ -308,12 +430,8 @@ export default function App() {
       setRecommendations(recsData);
       setDriftStep('results');
 
-      // Fire-and-forget: save session to MongoDB (never blocks the UI)
-      const bucketLabel = stateData.attentionCapacity < 35
-        ? 'brain-fried'
-        : stateData.attentionCapacity < 65
-        ? 'relaxed'
-        : 'hyper-focused';
+      // 4. Save Session snap to MongoDB (non-blocking)
+      const bucketLabel = getBucketName(stateData.attentionCapacity);
       fetch(`${API_BASE}/sessions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -322,7 +440,7 @@ export default function App() {
           calm:      stateData.calmLevel,
           attention: stateData.attentionCapacity,
           bucket:    bucketLabel,
-          moodLabel: mood,
+          moodLabel: classifiedMood,
           moodText:  text,
           recommendations: {
             tv:    { title: recsData.tv_show.title,  note: recsData.tv_show.extraInfo },
@@ -330,32 +448,29 @@ export default function App() {
             movie: { title: recsData.movie.title,    note: recsData.movie.extraInfo }
           }
         })
-      }).catch(err => console.warn('[Session save failed silently]', err));
+      }).catch(err => console.warn('[Session log failed]', err));
+
     } catch (err: any) {
-      setError(err.message || 'An error occurred during recommendations.');
+      setError(err.message || 'An error occurred during search.');
     } finally {
       setTimeout(() => {
-        triggerLoadingWithFact(false);
+        setIsLoading(false);
       }, 1500);
     }
   };
 
-  // Grief auto-load: passes time + energy directly to avoid stale React state
+  // Grief auto-load fallback
   const handleGriefAutoLoad = async () => {
-    const selectedTime = 'short';
-    const selectedEnergy = 'low';
-    setTimeAvailable(selectedTime);
-    setEnergyLevel(selectedEnergy);
-    triggerLoadingWithFact(true);
+    setIsLoading(true);
     setError(null);
     try {
       const stateResponse = await fetch(`${API_BASE}/state`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          mood,
-          timeAvailable: selectedTime,
-          energyLevel: selectedEnergy,
+          mood: 'sadness',
+          timeAvailable: 'short',
+          energyLevel: 'low',
           hour: new Date().getHours()
         })
       });
@@ -366,36 +481,35 @@ export default function App() {
       const recsResponse = await fetch(`${API_BASE}/recommendations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userState: stateData, moodText: text, moodLabel: mood })
+        body: JSON.stringify({ userState: stateData, moodText: text, moodLabel: 'sadness' })
       });
       if (!recsResponse.ok) throw new Error('Failed to retrieve recommendations.');
       const recsData: Recommendations = await recsResponse.json();
       setRecommendations(recsData);
       setDriftStep('results');
     } catch (err: any) {
-      setError(err.message || 'An error occurred.');
+      setError(err.message || 'Grief fallback matching failed.');
     } finally {
-      setTimeout(() => triggerLoadingWithFact(false), 1500);
+      setTimeout(() => setIsLoading(false), 1500);
     }
   };
 
   const handleReset = () => {
-    setDriftStep('mood');
+    setDriftStep('input');
     setText('');
+    setAttentionVal(50);
+    setSelectedContext('ALONE');
     setMood('neutral');
-    setTimeAvailable(null);
-    setEnergyLevel(null);
     setUserState(null);
     setRecommendations(null);
     setError(null);
   };
 
-  // Scaffolding Authentication Flow handlers
+  // Auth Submit Scaffold
   const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
 
-    // Basic Validation
     if (!authEmail.includes('@')) {
       setAuthError('Please enter a valid email address.');
       return;
@@ -424,16 +538,9 @@ export default function App() {
       setUserName(authName || authEmail.split('@')[0]);
       setUserEmail(authEmail);
       setAuthStep('dashboard');
-
-      // Clear input fields
+      
       setAuthPassword('');
       setAuthConfirmPassword('');
-
-      // If user was in the middle of onboarding, return them back to it
-      if (driftStep === 'auth-prompt') {
-        setDriftStep('time');
-        setActiveTab('drift');
-      }
     }, 1000);
   };
 
@@ -460,489 +567,818 @@ export default function App() {
     setBreathSeconds(4);
   };
 
-  const renderTagSymbol = (val: '-' | 'neutral' | '+') => {
-    if (val === '+') return <span className="symbol-plus">Low</span>;
-    if (val === '-') return <span className="symbol-minus">High</span>;
-    return <span className="symbol-neutral">Neutral</span>;
+  // Emoji graphic helper matching attention slider values
+  const getAttentionEmoji = () => {
+    if (attentionVal < 35) return '🥱';
+    if (attentionVal < 70) return '😌';
+    return '🧐';
   };
 
-  const renderTagBadge = (label: string, val: '-' | 'neutral' | '+') => {
-    let icon = '';
-    let colorClass = '';
-    if (val === '+') {
-      icon = '+';
-      colorClass = 'tag-positive';
-    } else if (val === '-') {
-      icon = '−';
-      colorClass = 'tag-negative';
+  const getAttentionEmojiLabel = () => {
+    if (attentionVal < 35) return ' momentary / low focus ';
+    if (attentionVal < 70) return ' balanced / comfortable ';
+    return ' intensive / deep focus ';
+  };
+
+  const handleSoundPlayToggle = (soundName: string) => {
+    if (playingSound === soundName) {
+      setPlayingSound(null);
     } else {
-      icon = '0';
-      colorClass = 'tag-neutral';
+      setPlayingSound(soundName);
+      setIsMuted(false);
     }
-    return (
-      <span className={`tag-badge ${colorClass}`}>
-        <span className="tag-icon">{icon}</span> {label}
-      </span>
-    );
-  };
-
-  const renderStepProgress = () => {
-    // 3 steps: mood (0), time (1), energy (2)
-    let currentIdx = 0;
-    if (driftStep === 'time') currentIdx = 1;
-    else if (driftStep === 'energy') currentIdx = 2;
-    else if (driftStep === 'results') return null; // hide on results
-
-    // Hide progress indicators for support or loading/auth prompts to preserve clean spacing
-    if (driftStep === 'support' || driftStep === 'auth-prompt') return null;
-
-    return (
-      <div className="step-progress">
-        {/* Step 1 */}
-        <div className={`step-progress-item ${currentIdx === 0 ? 's-current' : currentIdx > 0 ? 's-completed' : 'upcoming'}`}>
-          <span className="step-num">01</span>
-          <span className="step-label">mood</span>
-        </div>
-        
-        {/* Connector 1 -> 2 */}
-        <div className={`step-progress-connector ${currentIdx > 0 ? 's-completed' : ''}`} />
-
-        {/* Step 2 */}
-        <div className={`step-progress-item ${currentIdx === 1 ? 's-current' : currentIdx > 1 ? 's-completed' : 'upcoming'}`}>
-          <span className="step-num">02</span>
-          <span className="step-label">time</span>
-        </div>
-
-        {/* Connector 2 -> 3 */}
-        <div className={`step-progress-connector ${currentIdx > 1 ? 's-completed' : ''}`} />
-
-        {/* Step 3 */}
-        <div className={`step-progress-item ${currentIdx === 2 ? 's-current' : currentIdx > 2 ? 's-completed' : 'upcoming'}`}>
-          <span className="step-num">03</span>
-          <span className="step-label">energy</span>
-        </div>
-      </div>
-    );
-  };
-
-  // Humanise raw model label into a readable mood name
-  const formatMood = (rawMood: string): string => {
-    const map: Record<string, string> = {
-      sadness: 'Sadness',
-      joy: 'Joy',
-      fear: 'Stress / Anxiety',
-      anger: 'Frustration',
-      surprise: 'Surprise',
-      disgust: 'Discomfort',
-      excitement: 'Excitement',
-      neutral: 'Neutral'
-    };
-    return map[rawMood.toLowerCase()] ?? rawMood.charAt(0).toUpperCase() + rawMood.slice(1);
   };
 
   return (
-    <div className="app-container">
-      {/* Cinematic Background Atmosphere */}
+    <div className="min-h-screen text-on-surface font-body-md relative overflow-hidden bg-background">
+      {/* WebGL Canvas Background */}
+      <WebGLBackground />
+
+      {/* Atmospheric overlays */}
+      <div className="grain" />
+      <div className="vignette" />
       <div className="ambient-glows">
         <div className="glow-shape glow-1"></div>
         <div className="glow-shape glow-2"></div>
         <div className="glow-shape glow-3"></div>
       </div>
-      <div className="vignette"></div>
-      <div className="grain"></div>
 
-      {/* Global Frosted Navbar */}
-      <nav className="site-nav">
-        <div className="nav-inner">
-          <button className="nav-wordmark" onClick={() => setCurrentPage('home')}>drift</button>
-          <div className="nav-links">
-            <button
-              className={`nav-link${currentPage === 'progress' ? ' active' : ''}`}
-              onClick={() => setCurrentPage('progress')}
-            >Progress</button>
-            <a href="https://github.com/yugpokharel/Drift" target="_blank" rel="noreferrer" className="nav-link">GitHub ↗</a>
-          </div>
+      {/* Header Sticky Navigation */}
+      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-8 md:px-margin-desktop h-20 bg-background/80 backdrop-blur-xl border-b border-white/5 select-none">
+        <button className="font-headline-md text-headline-md tracking-tighter text-secondary uppercase hover:opacity-90 leading-none focus:outline-none" onClick={() => { handleReset(); setActiveTab('home'); }}>
+          Drift
+        </button>
+        <nav className="hidden md:flex items-center space-x-8">
+          <button 
+            className={`font-meta-technical text-meta-technical uppercase tracking-wider transition-colors pb-1 ${activeTab === 'home' ? 'text-secondary border-b-2 border-secondary' : 'text-on-surface-variant/60 hover:text-on-surface'}`}
+            onClick={() => setActiveTab('home')}
+          >
+            Home
+          </button>
+          <button 
+            className={`font-meta-technical text-meta-technical uppercase tracking-wider transition-colors pb-1 ${activeTab === 'progress' ? 'text-secondary border-b-2 border-secondary' : 'text-on-surface-variant/60 hover:text-on-surface'}`}
+            onClick={() => setActiveTab('progress')}
+          >
+            Progress
+          </button>
+          <button 
+            className={`font-meta-technical text-meta-technical uppercase tracking-wider transition-colors pb-1 ${activeTab === 'soundscapes' ? 'text-secondary border-b-2 border-secondary' : 'text-on-surface-variant/60 hover:text-on-surface'}`}
+            onClick={() => setActiveTab('soundscapes')}
+          >
+            Soundscapes
+          </button>
+          <button 
+            className={`font-meta-technical text-meta-technical uppercase tracking-wider transition-colors pb-1 ${activeTab === 'about' ? 'text-secondary border-b-2 border-secondary' : 'text-on-surface-variant/60 hover:text-on-surface'}`}
+            onClick={() => setActiveTab('about')}
+          >
+            About
+          </button>
+          <button 
+            className={`font-meta-technical text-meta-technical uppercase tracking-wider transition-colors pb-1 ${activeTab === 'profile' ? 'text-secondary border-b-2 border-secondary' : 'text-on-surface-variant/60 hover:text-on-surface'}`}
+            onClick={() => setActiveTab('profile')}
+          >
+            Profile
+          </button>
+        </nav>
+        <div className="flex items-center gap-4 text-on-surface-variant">
+          <button className="hover:text-primary transition-colors p-1.5 focus:outline-none" onClick={() => setActiveTab('profile')}>
+            <span className="material-symbols-outlined text-[22px]">account_circle</span>
+          </button>
         </div>
-      </nav>
+      </header>
 
-      {/* Page Shell with centered grid columns */}
-      <div className="page-shell">
-        {currentPage === 'progress' ? (
-          <Progress onNavigateHome={() => setCurrentPage('home')} />
-        ) : (
-        <>
-        <div className="content-col">
-          {isLoading ? (
-            <div className="loading-scene fade-in">
-              {userState ? (
-                /* Custom Circular Loading Dial */
-                <div className="loading-dial-wrapper">
-                  <div className="circular-dial">
-                    <svg width="180" height="180" viewBox="0 0 180 180">
-                      <circle cx="90" cy="90" r="80" className="dial-track" />
-                      <circle
-                        cx="90"
-                        cy="90"
-                        r="80"
-                        className="dial-fill"
-                        strokeDasharray="502.65"
-                        strokeDashoffset={dialOffset}
+      {/* Main Container */}
+      <main className="relative z-10 w-full min-h-screen pt-32 pb-24 flex flex-col items-center px-margin-mobile md:px-0">
+        
+        {/* TAB 1: HOME */}
+        {activeTab === 'home' && (
+          <div className="w-full max-w-4xl flex flex-col items-center">
+            
+            {/* Loading Overlay State */}
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center py-20 animate-settle w-full max-w-2xl">
+                {userState ? (
+                  <div className="flex flex-col items-center space-y-10">
+                    {/* Dial Ring progress */}
+                    <div className="relative w-48 h-48 flex items-center justify-center">
+                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 180 180">
+                        <circle cx="90" cy="90" r="80" className="stroke-white/5 fill-transparent" strokeWidth="4" />
+                        <circle
+                          cx="90"
+                          cy="90"
+                          r="80"
+                          className="stroke-secondary fill-transparent dial-fill"
+                          strokeWidth="4"
+                          strokeLinecap="round"
+                          strokeDasharray="502.65"
+                          strokeDashoffset={dialOffset}
+                          style={{ filter: "drop-shadow(0 0 8px #a7ff8340)" }}
+                        />
+                      </svg>
+                      <div className="absolute flex flex-col items-center justify-center text-center">
+                        <span className="font-meta-technical text-[10px] text-outline uppercase tracking-widest">STATE EXPECT</span>
+                        <span className="font-headline-sm text-headline-sm text-secondary uppercase mt-1">{getBucketName(userState.attentionCapacity)}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="text-center space-y-2">
+                      <p className="font-meta-technical text-meta-technical text-secondary uppercase tracking-[0.25em] animate-pulse">
+                        {LOADING_MESSAGES[messageIdx]}
+                      </p>
+                      <p className="text-[12px] text-outline max-w-sm italic">"{currentFact}"</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center space-y-8">
+                    <div className="breathing-circle w-16 h-16 bg-secondary/15 rounded-full border border-secondary/30 flex items-center justify-center">
+                      <span className="w-6 h-6 bg-secondary rounded-full" style={{ boxShadow: '0 0 15px #a7ff83' }}></span>
+                    </div>
+                    <div className="text-center space-y-1">
+                      <p className="font-meta-technical text-[12px] text-secondary uppercase tracking-[0.2em]">CLASSIFYING MOOD LOG...</p>
+                      <p className="text-[13px] text-outline italic">Analyzing input text tokens</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                {/* STEP A: Onboarding Form */}
+                {driftStep === 'input' && (
+                  <div className="w-full flex flex-col items-center">
+                    {/* Hero copy */}
+                    <section className="text-center mb-16 max-w-3xl animate-in fade-in duration-700">
+                      <span className="font-meta-technical text-[11px] text-secondary mb-4 block tracking-[0.3em] uppercase">DAILY ARCHIVE // SESSION_INIT</span>
+                      <h1 className="font-display-lg text-display-lg-mobile md:text-display-lg mb-6 text-primary leading-none">
+                        How was your day?
+                      </h1>
+                      <div className="max-w-2xl mx-auto border-l-2 border-secondary/30 pl-6 py-1">
+                        <p className="font-headline-sm text-[20px] italic text-on-surface-variant font-light text-left leading-relaxed">
+                          "Choice is the thief of time. Less choosing, more living."
+                        </p>
+                      </div>
+                    </section>
+
+                    {/* Entry Form Card */}
+                    <section className="w-full max-w-2xl glass-card rounded-[24px] p-8 md:p-12 relative shadow-2xl animate-settle">
+                      {/* Technical Corner accents */}
+                      <div className="absolute top-0 left-0 w-5 h-5 border-t border-l border-secondary"></div>
+                      <div className="absolute top-0 right-0 w-5 h-5 border-t border-r border-secondary"></div>
+                      <div className="absolute bottom-0 left-0 w-5 h-5 border-b border-l border-secondary"></div>
+                      <div className="absolute bottom-0 right-0 w-5 h-5 border-b border-r border-secondary"></div>
+
+                      <div className="space-y-12">
+                        {/* Text Journal Input */}
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center">
+                            <label className="font-meta-technical text-[11px] text-outline uppercase tracking-wider">ENTRY_LOG_01</label>
+                            <span className="text-[11px] text-outline/50 font-meta-technical">{text.length}/500</span>
+                          </div>
+                          <textarea
+                            value={text}
+                            onChange={(e) => setText(e.target.value)}
+                            placeholder="Type a few words describing your mental state, or proceed with guest presets..."
+                            className="w-full bg-transparent border-0 border-b border-outline-variant pb-3 text-headline-sm placeholder:text-outline/40 focus:ring-0 focus:border-secondary transition-all outline-none text-on-surface resize-none h-16 font-light"
+                            maxLength={500}
+                          />
+                        </div>
+
+                        {/* Slider Attention Level */}
+                        <div className="space-y-6">
+                          <div className="flex justify-between items-end">
+                            <label className="font-meta-technical text-[11px] text-outline uppercase tracking-wider">ATTENTION_SPAN_METRIC</label>
+                            <span className="font-meta-technical text-secondary text-[11px] uppercase tracking-wider bg-secondary/5 border border-secondary/15 px-2.5 py-0.5 rounded-full">
+                              VALUE: {attentionVal}%
+                            </span>
+                          </div>
+                          <div className="w-full relative py-2">
+                            {/* Floating emoji feedback above thumb */}
+                            <div 
+                              className="absolute -top-12 flex flex-col items-center transition-all duration-300"
+                              style={{ left: `calc(${attentionVal}% - 16px)` }}
+                            >
+                              <span className="text-2xl animate-bounce">{getAttentionEmoji()}</span>
+                              <span className="text-[9px] text-outline uppercase tracking-wider whitespace-nowrap bg-background px-1.5 py-0.5 border border-white/5 rounded mt-1">{getAttentionEmojiLabel()}</span>
+                            </div>
+                            
+                            <input
+                              type="range"
+                              min="1"
+                              max="100"
+                              value={attentionVal}
+                              onChange={(e) => setAttentionVal(Number(e.target.value))}
+                              className="cursor-crosshair w-full"
+                            />
+                            
+                            <div className="flex justify-between mt-4 font-meta-technical text-[10px] text-outline px-0">
+                              <span className="tracking-widest">MIN // MOMENTARY</span>
+                              <span className="tracking-widest">MAX // IMMERSIVE</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Context Pills */}
+                        <div className="space-y-4">
+                          <p className="font-meta-technical text-[11px] text-outline uppercase tracking-wider text-center">ENVIRONMENT_CONTEXT</p>
+                          <div className="flex flex-wrap justify-center gap-3">
+                            {(['ALONE', 'WITH OTHERS', 'BACKGROUND WATCH', 'FULLY FOCUSED'] as const).map((ctx) => (
+                              <button
+                                key={ctx}
+                                type="button"
+                                className={`px-6 py-2.5 border rounded-full font-meta-technical text-[11px] uppercase tracking-wider transition-all duration-300 ${
+                                  selectedContext === ctx 
+                                    ? 'bg-secondary text-on-secondary border-secondary shadow-lg shadow-secondary/10 hover:opacity-90'
+                                    : 'border-outline-variant bg-surface-container/60 text-on-surface-variant hover:border-secondary hover:text-secondary'
+                                }`}
+                                onClick={() => setSelectedContext(ctx)}
+                              >
+                                {ctx.toLowerCase()}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Error state */}
+                        {error && (
+                          <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl font-meta-technical text-center">
+                            ⚠️ {error}
+                          </div>
+                        )}
+
+                        {/* Primary Submit */}
+                        <button
+                          onClick={handleExecuteSearch}
+                          className="w-full py-5 bg-secondary text-on-secondary font-meta-technical text-[12px] font-bold tracking-[0.2em] uppercase hover:bg-white transition-all border border-secondary active:scale-[0.99] select-none"
+                        >
+                          EXECUTE_SEARCH
+                        </button>
+                      </div>
+                    </section>
+
+                    {/* Aesthetic credits footer */}
+                    <div className="mt-16 w-full max-w-container-max flex flex-col md:flex-row justify-between items-center opacity-40 px-margin-desktop py-6 text-on-surface-variant border-t border-outline-variant/30 text-[10px] font-meta-technical tracking-widest uppercase">
+                      <span>© 2025 DRIFT_EDITORIAL / ARCHIVE_SYSTEM</span>
+                      <div className="flex gap-8 mt-4 md:mt-0">
+                        <span className="text-secondary">EST: ML-32M PIPELINE</span>
+                        <span>NODE.JS · MONGODB</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP B: Grief Support */}
+                {driftStep === 'support' && (
+                  <div className="w-full max-w-xl text-center py-20 animate-settle">
+                    <div className="glass-card rounded-[32px] p-12 border border-outline-variant/40 flex flex-col items-center space-y-6">
+                      <span className="material-symbols-outlined text-4xl text-tertiary animate-pulse">spa</span>
+                      <h1 className="font-display-lg text-headline-md text-tertiary italic">
+                        Take a gentle breath.
+                      </h1>
+                      <p className="text-on-surface-variant text-body-lg leading-relaxed max-w-md">
+                        I hear you. That sounds really heavy. We are skipping choices tonight and locating a gentle, comforting space for you now.
+                      </p>
+                      <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden relative">
+                        <div 
+                          className="h-full bg-tertiary transition-all duration-1000 ease-linear"
+                          style={{ width: `${((3 - supportCountdown) / 3) * 100}%` }}
+                        />
+                      </div>
+                      <p className="font-meta-technical text-[10px] text-outline uppercase tracking-widest">
+                        Redirecting in {supportCountdown}s...
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP C: Results Display (Cinematic pick) */}
+                {driftStep === 'results' && userState && recommendations && (
+                  <div className="w-full space-y-16 animate-in fade-in duration-1000">
+                    
+                    {/* 1. Curated Pick Hero banner */}
+                    <section className="relative rounded-[32px] overflow-hidden border border-outline-variant/40 glass-card flex flex-col md:flex-row min-h-[500px]">
+                      {/* Left metadata info column */}
+                      <div className="w-full md:w-3/5 p-8 md:p-12 flex flex-col justify-between z-20 space-y-8">
+                        <div className="space-y-4">
+                          <div>
+                            <span className="font-meta-technical text-[10px] text-secondary border border-secondary/30 bg-secondary/5 px-2.5 py-1 uppercase tracking-widest rounded">
+                              CURATOR'S DAILY PICK
+                            </span>
+                          </div>
+                          
+                          <h1 className="font-display-lg text-display-lg-mobile md:text-display-lg text-primary leading-none tracking-tight">
+                            {recommendations.movie.title}
+                          </h1>
+                          
+                          <div className="flex items-center gap-3 font-meta-technical text-[11px] text-outline uppercase tracking-wider">
+                            <span>MOVIE PICK</span>
+                            <span className="w-1.5 h-1.5 bg-outline-variant rounded-full" />
+                            <span>{recommendations.movie.genres?.join(' / ') || 'Film'}</span>
+                          </div>
+                        </div>
+
+                        {/* OMDb Scores display row */}
+                        <div className="flex flex-wrap gap-4">
+                          <div className="flex items-center gap-2 border border-outline-variant/40 bg-white/3 px-3.5 py-2 font-meta-technical text-[11px] group hover:border-white/20 transition-colors">
+                            <span className="text-[10px] text-outline">IMDB</span>
+                            <span className="text-on-surface">[ {recommendations.movie.imdbRating || '7.8'} <span className="text-outline/50">/ 10</span> ]</span>
+                          </div>
+                          <div className="flex items-center gap-2 border border-outline-variant/40 bg-white/3 px-3.5 py-2 font-meta-technical text-[11px] group hover:border-white/20 transition-colors">
+                            <span className="text-[10px] text-outline">ROTTEN TOM.</span>
+                            <span className="text-secondary">[ {recommendations.movie.rottenTomatoes || '89% FRESH'} ]</span>
+                          </div>
+                          <div className="flex items-center gap-2 border border-outline-variant/40 bg-white/3 px-3.5 py-2 font-meta-technical text-[11px] group hover:border-white/20 transition-colors">
+                            <span className="text-[10px] text-outline">COGNITIVE MATCH</span>
+                            <span className="text-tertiary">[ EXCELLENT ]</span>
+                          </div>
+                        </div>
+
+                        {/* Why this pick editorial snippet */}
+                        <div className="border-t border-outline-variant/30 pt-6 max-w-xl">
+                          <h4 className="font-meta-technical text-[10px] text-secondary uppercase tracking-widest mb-2.5 flex items-center gap-2">
+                            <span className="w-5 h-[1.5px] bg-secondary" /> Why this pick
+                          </h4>
+                          <p className="font-headline-sm text-[18px] leading-relaxed italic text-on-surface-variant font-light">
+                            {recommendations.movie.whyThisPick || 
+                              `This was chosen because it demands comfortable attention and provides the intellectual and atmospheric tone that matches your ${getBucketName(userState.attentionCapacity)} state.`}
+                          </p>
+                        </div>
+
+                        {/* CTAs */}
+                        <div className="flex flex-wrap gap-4 pt-2">
+                          <button className="bg-primary text-on-primary px-8 py-4 font-meta-technical text-[12px] uppercase tracking-wider font-semibold hover:bg-secondary hover:text-on-secondary transition-all duration-300 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px]">play_arrow</span> Start Watching
+                          </button>
+                          <button className="border border-outline-variant/60 text-on-surface px-8 py-4 font-meta-technical text-[12px] uppercase tracking-wider hover:bg-white/5 transition-all duration-300 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px]">add</span> Add To Archive
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Right art placeholder column */}
+                      <div className="hidden md:block w-2/5 relative z-10 overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent z-20"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent z-20"></div>
+                        {/* A gorgeous atmospheric cover art placeholder */}
+                        <div className="w-full h-full bg-cover bg-center filter saturate-75 brightness-[0.7] group-hover:scale-105 transition-transform duration-[20s]" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=800')` }} />
+                      </div>
+                    </section>
+
+                    {/* 2. Gauges & Bento Grid secondary picks */}
+                    <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                      {/* Gauges card (4 columns) */}
+                      <div className="md:col-span-4 glass-card rounded-[24px] p-8 border border-outline-variant/30 flex flex-col justify-between min-h-[350px]">
+                        <div>
+                          <span className="font-meta-technical text-[10px] text-outline uppercase tracking-widest block mb-2">METRICS // snap</span>
+                          <h3 className="font-headline-sm text-headline-sm text-on-surface">Cognitive load</h3>
+                          <p className="text-[12px] text-outline mt-1 mb-8">Estimated values based on log analysis.</p>
+                          
+                          <div className="space-y-6">
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-[11px] font-meta-technical">
+                                <span className="text-outline uppercase">Stress</span>
+                                <span className="text-error font-bold">{userState.stressLevel}%</span>
+                              </div>
+                              <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-error transition-all duration-1000" style={{ width: animateGauges ? `${userState.stressLevel}%` : '0%' }} />
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-[11px] font-meta-technical">
+                                <span className="text-outline uppercase">Calm</span>
+                                <span className="text-tertiary font-bold">{userState.calmLevel}%</span>
+                              </div>
+                              <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-tertiary transition-all duration-1000" style={{ width: animateGauges ? `${userState.calmLevel}%` : '0%' }} />
+                              </div>
+                            </div>
+
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-[11px] font-meta-technical">
+                                <span className="text-outline uppercase">Attention</span>
+                                <span className="text-secondary font-bold">{userState.attentionCapacity}%</span>
+                              </div>
+                              <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-secondary transition-all duration-1000" style={{ width: animateGauges ? `${userState.attentionCapacity}%` : '0%' }} />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="text-[10px] text-outline/50 font-meta-technical border-t border-outline-variant/35 pt-4 mt-6 uppercase tracking-wider text-center">
+                          SESSION SNAPSHOT SAVED
+                        </div>
+                      </div>
+
+                      {/* Secondary Bento Grid (8 columns) */}
+                      <div className="md:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-8">
+                        {/* TV Show card */}
+                        <div className="glass-card rounded-[24px] p-8 border border-outline-variant/30 flex flex-col justify-between hover:border-white/20 transition-all duration-500 group min-h-[350px]">
+                          <div>
+                            <div className="flex justify-between items-start mb-6">
+                              <span className="font-meta-technical text-[10px] text-tertiary border border-tertiary/20 bg-tertiary/5 px-2 py-0.5 rounded uppercase">
+                                📺 TV SHOW
+                              </span>
+                              <span className="material-symbols-outlined text-outline/40 group-hover:text-tertiary transition-colors">tv</span>
+                            </div>
+                            <h3 className="font-headline-md text-headline-sm text-primary mb-3 group-hover:text-tertiary transition-colors duration-300">
+                              {recommendations.tv_show.title}
+                            </h3>
+                            <p className="text-on-surface-variant text-[14px] leading-relaxed line-clamp-4">
+                              {recommendations.tv_show.extraInfo}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center justify-between border-t border-outline-variant/20 pt-4 mt-6">
+                            <span className="font-meta-technical text-[10px] text-outline uppercase">Match: {getBucketName(userState.attentionCapacity)}</span>
+                            <button className="text-[11px] font-meta-technical text-secondary hover:underline uppercase tracking-wider">Explore</button>
+                          </div>
+                        </div>
+
+                        {/* Music card */}
+                        <div className="glass-card rounded-[24px] p-8 border border-outline-variant/30 flex flex-col justify-between hover:border-white/20 transition-all duration-500 group min-h-[350px]">
+                          <div>
+                            <div className="flex justify-between items-start mb-6">
+                              <span className="font-meta-technical text-[10px] text-secondary border border-secondary/20 bg-secondary/5 px-2 py-0.5 rounded uppercase">
+                                🎵 MUSIC
+                              </span>
+                              <span className="material-symbols-outlined text-outline/40 group-hover:text-secondary transition-colors">music_note</span>
+                            </div>
+                            <h3 className="font-headline-md text-headline-sm text-primary mb-3 group-hover:text-secondary transition-colors duration-300">
+                              {recommendations.music.title}
+                            </h3>
+                            <p className="text-on-surface-variant text-[14px] leading-relaxed line-clamp-4">
+                              {recommendations.music.extraInfo}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center justify-between border-t border-outline-variant/20 pt-4 mt-6">
+                            <span className="font-meta-technical text-[10px] text-outline uppercase">Match: all-day comfort</span>
+                            <button className="text-[11px] font-meta-technical text-secondary hover:underline uppercase tracking-wider">Play Track</button>
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+
+                    {/* Reset Button */}
+                    <div className="flex justify-center pt-8">
+                      <button 
+                        onClick={handleReset}
+                        className="px-10 py-4 border border-outline-variant hover:border-secondary hover:text-secondary font-meta-technical text-[12px] uppercase tracking-widest transition-all duration-300 bg-surface-container-low/40 backdrop-blur"
+                      >
+                        Start Over // Reset
+                      </button>
+                    </div>
+
+                  </div>
+                )}
+              </>
+            )}
+
+          </div>
+        )}
+
+        {/* TAB 2: PROGRESS (Analytics Component) */}
+        {activeTab === 'progress' && (
+          <Progress onNavigateHome={() => setActiveTab('home')} />
+        )}
+
+        {/* TAB 3: SOUNDSCAPES & FOCUS MODE */}
+        {activeTab === 'soundscapes' && (
+          <div className="w-full max-w-container-max mx-auto py-12 px-6 md:px-margin-desktop fade-in z-10 relative">
+            <header className="mb-12 text-center max-w-2xl mx-auto">
+              <span className="font-meta-technical text-[11px] text-secondary uppercase tracking-[0.2em] mb-2 block">FOCUS_SPACE // SNAPS</span>
+              <h1 className="font-display-lg text-display-lg-mobile md:text-display-lg text-primary leading-none mb-3">Soundscapes & Focus</h1>
+              <p className="text-on-surface-variant text-body-lg">Cinematic soundscapes and integrated Pomodoro timers designed to ground your focus and lock out digital noise.</p>
+            </header>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              
+              {/* Left Column: Pomodoro Timer & Breathing */}
+              <div className="lg:col-span-5 space-y-8">
+                {/* Timer Card */}
+                <div className="glass-card rounded-[24px] p-8 border border-outline-variant/30 text-center relative overflow-hidden flex flex-col items-center">
+                  <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-secondary"></div>
+                  <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-secondary"></div>
+                  
+                  <span className="font-meta-technical text-[9px] text-outline uppercase tracking-widest block mb-4">Focus Clock</span>
+                  
+                  <div className="relative w-40 h-40 flex items-center justify-center mb-6">
+                    {/* Ring background */}
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="45" className="stroke-white/5 fill-transparent" strokeWidth="2" />
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="45" 
+                        className={`fill-transparent transition-all duration-1000 ${isFocusRunning ? 'stroke-secondary' : 'stroke-outline-variant'}`}
+                        strokeWidth="2"
+                        strokeDasharray="282.7"
+                        strokeDashoffset={282.7 - (focusTimeLeft / 1500) * 282.7}
                       />
                     </svg>
-                    <div className="dial-center">
-                      <span className="dial-bucket-name">{getBucketName(userState.attentionCapacity)}</span>
+                    <span className="absolute text-3xl font-meta-technical text-primary font-bold">{formatFocusTime(focusTimeLeft)}</span>
+                  </div>
+
+                  <div className="flex gap-4 w-full">
+                    <button 
+                      onClick={() => setIsFocusRunning(!isFocusRunning)}
+                      className={`flex-1 py-3 text-[11px] font-meta-technical uppercase tracking-wider border transition-all ${
+                        isFocusRunning 
+                          ? 'border-error text-error hover:bg-error/5' 
+                          : 'border-secondary text-secondary hover:bg-secondary/5'
+                      }`}
+                    >
+                      {isFocusRunning ? 'Pause' : 'Start Focus'}
+                    </button>
+                    <button 
+                      onClick={() => { setIsFocusRunning(false); setFocusTimeLeft(1500); }}
+                      className="border border-outline-variant hover:border-white px-5 py-3 text-[11px] font-meta-technical uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-all"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </div>
+
+                {/* Breathing box */}
+                <div className="glass-card rounded-[24px] p-8 border border-outline-variant/30 text-center relative flex flex-col items-center">
+                  <span className="font-meta-technical text-[9px] text-outline uppercase tracking-widest block mb-4">Bio-Feedback Regulator</span>
+                  
+                  {breathState === 'idle' ? (
+                    <div className="py-8 space-y-6 flex flex-col items-center">
+                      <p className="text-on-surface-variant text-[14px] leading-relaxed max-w-xs">
+                        Trigger a paced breathing cycle to activate your parasympathetic nervous system and settle anxiety.
+                      </p>
+                      <button 
+                        onClick={handleBreathingStart}
+                        className="px-8 py-3.5 bg-tertiary text-on-tertiary font-meta-technical text-[11px] uppercase tracking-wider hover:opacity-90 transition-all border border-tertiary"
+                      >
+                        Breathe Snap-in
+                      </button>
                     </div>
-                  </div>
-                  <div className="loading-messages">
-                    <p className="loading-message-text">{LOADING_MESSAGES[messageIdx]}</p>
-                  </div>
-                </div>
-              ) : (
-                /* Initial Fact Loader for Mood text analysis */
-                <div className="loading-content">
-                  <div className="breathing-ring"></div>
-                  <div className="fun-fact-container">
-                    <span className="fun-fact-label">Wellness Insight</span>
-                    <p className="fun-fact-text">"{currentFact}"</p>
-                  </div>
-                  <div className="calm-spinner-subtitle">Aligning recommendations...</div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <>
-              {driftStep !== 'results' ? (
-                /* SCREEN 1: Onboarding Viewport */
-                <div className="screen-one">
-                  <div className={`onboarding-grid ${driftStep === 'support' || driftStep === 'auth-prompt' ? 'grid-centered' : ''}`}>
-                    
-                    {/* Left Column: Hero Editorial Info */}
-                    {driftStep !== 'support' && driftStep !== 'auth-prompt' && (
-                      <div className="onboarding-left fade-up">
-                        <div className="hero-section">
-                          <p className="hero-eyebrow">
-                            <span className="hero-eyebrow-dot" />
-                            digital wellbeing · mood tracking
-                          </p>
-                          <h1 className="hero-headline">what can your brain actually handle right now?</h1>
-                          <p className="hero-subline">not what you like. what you can actually take on right now — based on your real cognitive state.</p>
-                          <hr className="hero-divider" />
-                          <p className="hero-quote-text">
-                            "The greater the number of choices, the greater the suffering induced by trying to choose."
-                          </p>
-                          <p className="hero-quote-attr">— on the paradox of choice</p>
-                          <div className="hero-pills">
-                            <span className="hero-pill">📺  tv shows</span>
-                            <span className="hero-pill">🎵  music</span>
-                            <span className="hero-pill">🎬  movies</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Right Column: Input & Wizard Card */}
-                    <div className="onboarding-right">
-                      {/* Floating weightless orb graphics */}
-                      {driftStep !== 'support' && driftStep !== 'auth-prompt' && (
-                        <div className="cosmic-orb-graphic">
-                          <div className="orb-ring orb-ring-1"></div>
-                          <div className="orb-ring orb-ring-2"></div>
-                          <div className="orb-core"></div>
-                        </div>
-                      )}
-
-                      <div className="input-section fade-in">
-                        {/* Step Progress Bar (Labeled Steps with Connector Line) */}
-                        {renderStepProgress()}
-
-                        <div className="step-content-wrapper">
-                          {/* Step 1: Mood */}
-                          {driftStep === 'mood' && (
-                            <div className="step-slide fade-up">
-                              <div className="prompt-box-card">
-                                <label className="prompt-label">how's it going, really</label>
-                                <textarea
-                                  value={text}
-                                  onChange={(e) => setText(e.target.value)}
-                                  placeholder="tired, brain is mush... or actually feeling good"
-                                  className="mood-textarea"
-                                  maxLength={500}
-                                />
-                                <div className="prompt-box-footer">
-                                  <span className="hint-text">no thinking required</span>
-                                  <button
-                                    onClick={handleMoodSubmit}
-                                    disabled={!text.trim()}
-                                    className="send-btn"
-                                    aria-label="Send mood input"
-                                  >
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                      <path d="M5 12h14M12 5l7 7-7 7"/>
-                                    </svg>
-                                  </button>
-                                </div>
-                              </div>
-
-                              <div className="suggestions-row">
-                                {suggestions.map((s, idx) => (
-                                  <button
-                                    key={idx}
-                                    onClick={() => handleSuggestionClick(s.text, idx)}
-                                    className={`suggestion-pill ${activePillIdx === idx ? 'pill-active' : ''}`}
-                                    type="button"
-                                  >
-                                    {s.label.toLowerCase()}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Grief Support */}
-                          {driftStep === 'support' && (
-                            <div className="step-slide fade-up grief-space">
-                              <h1 className="title-accent-violet" style={{ fontSize: '2rem', marginBottom: '12px' }}>
-                                Take a breath.
-                              </h1>
-                              <p className="grief-message">
-                                I hear you. That sounds really hard.<br />
-                                I am finding something gentle for you right now.
-                              </p>
-                              <div className="grief-countdown-bar">
-                                <div
-                                  className="grief-countdown-fill"
-                                  style={{ width: `${((3 - supportCountdown) / 3) * 100}%` }}
-                                />
-                              </div>
-                              <p className="grief-hint">Loading your comfort space{'.'.repeat(3 - supportCountdown + 1)}</p>
-                            </div>
-                          )}
-
-                          {/* Auth Prompt */}
-                          {driftStep === 'auth-prompt' && (
-                            <div className="step-slide fade-up text-center auth-prompt-card">
-                              <h1 className="title-accent-green">Track Your State</h1>
-                              <p className="subtitle">Would you like to log in to save your cognitive snapshots over time?</p>
-                              <div className="button-group-vertical">
-                                <button
-                                  onClick={() => {
-                                    setAuthStep('login');
-                                    setDriftStep('time');
-                                  }}
-                                  className="action-button"
-                                >
-                                  Sign In / Create Account
-                                </button>
-                                <button
-                                  onClick={() => setDriftStep('time')}
-                                  className="secondary-button"
-                                >
-                                  Continue as Guest
-                                </button>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Step 2: Time Available */}
-                          {driftStep === 'time' && (
-                            <div className="step-slide fade-up">
-                              <h2 className="step-question">how much time do you have?</h2>
-                              <div className="step-grid">
-                                <div
-                                  className={`choice-card ${timeAvailable === 'short' ? 'selected' : ''}`}
-                                  onClick={() => { setTimeAvailable('short'); setDriftStep('energy'); }}
-                                >
-                                  <div className="choice-title">a few minutes</div>
-                                  <div className="choice-desc">Just killing time</div>
-                                </div>
-                                <div
-                                  className={`choice-card ${timeAvailable === 'medium' ? 'selected' : ''}`}
-                                  onClick={() => { setTimeAvailable('medium'); setDriftStep('energy'); }}
-                                >
-                                  <div className="choice-title">an episode or two</div>
-                                  <div className="choice-desc">30–50 min</div>
-                                </div>
-                                <div
-                                  className={`choice-card ${timeAvailable === 'long' ? 'selected' : ''}`}
-                                  onClick={() => { setTimeAvailable('long'); setDriftStep('energy'); }}
-                                >
-                                  <div className="choice-title">the whole evening</div>
-                                  <div className="choice-desc">could binge</div>
-                                </div>
-                              </div>
-                              <div className="wizard-buttons">
-                                <button className="back-btn" onClick={() => setDriftStep('mood')}>← back</button>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Step 3: Energy Level */}
-                          {driftStep === 'energy' && (
-                            <div className="step-slide fade-up">
-                              <h2 className="step-question">energy to focus?</h2>
-                              <div className="step-grid">
-                                <div
-                                  className={`choice-card ${energyLevel === 'low' ? 'selected' : ''}`}
-                                  onClick={() => handleEnergySelect('low')}
-                                >
-                                  <div className="choice-title">basically none</div>
-                                  <div className="choice-desc">don't make me think</div>
-                                </div>
-                                <div
-                                  className={`choice-card ${energyLevel === 'mid' ? 'selected' : ''}`}
-                                  onClick={() => handleEnergySelect('mid')}
-                                >
-                                  <div className="choice-title">some</div>
-                                  <div className="choice-desc">can follow a plot</div>
-                                </div>
-                                <div
-                                  className={`choice-card ${energyLevel === 'high' ? 'selected' : ''}`}
-                                  onClick={() => handleEnergySelect('high')}
-                                >
-                                  <div className="choice-title">plenty</div>
-                                  <div className="choice-desc">give me something dense</div>
-                                </div>
-                              </div>
-                              <div className="wizard-buttons">
-                                <button className="back-btn" onClick={() => setDriftStep('time')}>← back</button>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-              ) : (
-                /* SCREEN 2: Results Display */
-                userState && recommendations && (
-                  <div className="screen-two fade-in">
-                    
-                    {/* 1. Horizontal State Band */}
-                    <div className="state-band fade-up">
-                      <div className="state-band-left">
-                        <p className="state-eyebrow">estimated cognitive state</p>
-                        <div className="state-bucket-name">{getBucketName(userState.attentionCapacity)}</div>
-                        <div className="state-descriptor">
-                          {userState.attentionCapacity < 35
-                            ? 'your brain needs easy tonight'
-                            : userState.attentionCapacity < 70
-                            ? 'enough left for a real story'
-                            : 'you can handle the dense stuff'}
-                        </div>
+                  ) : (
+                    <div className="py-6 space-y-6 flex flex-col items-center w-full">
+                      {/* Breathing ring scaling graphic */}
+                      <div className="w-32 h-32 flex items-center justify-center relative">
+                        <div 
+                          className="absolute w-24 h-24 rounded-full bg-tertiary/10 border-2 border-tertiary/40 transition-all duration-[4s] ease-in-out"
+                          style={{
+                            transform: breathState === 'inhale' ? 'scale(1.3)' 
+                                     : breathState === 'hold' ? 'scale(1.3)' 
+                                     : 'scale(0.85)',
+                            boxShadow: breathState === 'inhale' || breathState === 'hold' 
+                                      ? '0 0 25px rgba(205, 191, 240, 0.4)' 
+                                      : 'none'
+                          }}
+                        />
+                        <span className="text-xl font-meta-technical text-primary font-bold z-10">{breathSeconds}s</span>
                       </div>
                       
-                      <div className="state-band-right">
-                        <div className="state-gauge-item">
-                          <span className="gauge-label">stress</span>
-                          <div className="gauge-track">
-                            <div className="gauge-fill-bar bar-stress" style={{ width: animateGauges ? `${userState.stressLevel}%` : '0%' }} />
-                          </div>
-                          <div className="gauge-value">{userState.stressLevel}</div>
-                        </div>
-                        <div className="state-gauge-item">
-                          <span className="gauge-label">calm</span>
-                          <div className="gauge-track">
-                            <div className="gauge-fill-bar bar-calm" style={{ width: animateGauges ? `${userState.calmLevel}%` : '0%' }} />
-                          </div>
-                          <div className="gauge-value">{userState.calmLevel}</div>
-                        </div>
-                        <div className="state-gauge-item">
-                          <span className="gauge-label">attention</span>
-                          <div className="gauge-track">
-                            <div className="gauge-fill-bar bar-attention" style={{ width: animateGauges ? `${userState.attentionCapacity}%` : '0%' }} />
-                          </div>
-                          <div className="gauge-value">{userState.attentionCapacity}</div>
-                        </div>
+                      <div className="space-y-1 text-center">
+                        <p className="font-meta-technical text-[12px] text-tertiary uppercase tracking-widest font-bold">
+                          {breathState === 'inhale' ? 'Breathe In' 
+                           : breathState === 'hold' ? 'Hold' 
+                           : 'Breathe Out'}
+                        </p>
+                        <p className="text-[12px] text-outline italic">Deep diaphragmatic respiration</p>
                       </div>
-                      <p className="state-disclaimer">estimated from your text input — not a real biometric reading</p>
-                    </div>
 
-                    {/* 2. Headline & Subline */}
-                    <div className="results-section-head fade-up">
-                      <h1 className="results-headline">here's what fits</h1>
-                      <p className="results-subline">one pick per category · matched to your state right now</p>
+                      <button 
+                        onClick={handleBreathingStop}
+                        className="text-[11px] text-outline hover:text-error uppercase tracking-wider font-meta-technical transition-colors pt-2"
+                      >
+                        Stop Cycle
+                      </button>
                     </div>
+                  )}
+                </div>
+              </div>
 
-                    {/* 3. Three recommendation cards in Bento Grid */}
-                    <div className="bento-grid">
-                      {/* TV Show — hero tall-left card */}
-                      <div className="bento-hero card-stagger-1">
-                        <div className="recommendation-card">
-                          <div className="category-label">📺 tv show</div>
-                          <h2 className="item-title">{recommendations.tv_show.title}</h2>
-                          <p className="item-description">{recommendations.tv_show.extraInfo}</p>
-                          <div className="item-tags-row">
-                            {renderTagBadge('stress', recommendations.tv_show.stress)}
-                            {renderTagBadge('calm', recommendations.tv_show.calm)}
-                            {renderTagBadge('attention', recommendations.tv_show.attention)}
-                          </div>
+              {/* Right Column: Soundscape Cards */}
+              <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {[
+                  { name: 'Rain', icon: 'umbrella', url: 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&q=80&w=400' },
+                  { name: 'Forest', icon: 'forest', url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=400' },
+                  { name: 'Ocean Waves', icon: 'tsunami', url: 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&q=80&w=400' },
+                  { name: 'White Noise', icon: 'texture', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=400' }
+                ].map((scape) => (
+                  <div 
+                    key={scape.name}
+                    className={`glass-card rounded-[24px] overflow-hidden border transition-all duration-500 group flex flex-col justify-between min-h-[250px] ${
+                      playingSound === scape.name 
+                        ? 'border-secondary/40 shadow-lg shadow-secondary/5 bg-secondary/[0.02]' 
+                        : 'border-outline-variant/30 hover:border-white/20'
+                    }`}
+                  >
+                    <div className="relative h-28 overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent z-10" />
+                      <div 
+                        className="w-full h-full bg-cover bg-center filter grayscale group-hover:grayscale-0 transition-all duration-700 saturate-50 brightness-[0.7]" 
+                        style={{ backgroundImage: `url('${scape.url}')` }} 
+                      />
+                    </div>
+                    
+                    <div className="p-6 flex-grow flex flex-col justify-between">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-headline-sm text-[18px] text-primary">{scape.name}</h4>
+                          <span className="font-meta-technical text-[9px] text-outline uppercase tracking-wider">Cinematic Soundscape</span>
                         </div>
+                        <span className="material-symbols-outlined text-outline/30 group-hover:text-secondary transition-colors">{scape.icon}</span>
                       </div>
-                      {/* Music — top-right */}
-                      <div className="bento-secondary card-stagger-2">
-                        <div className="recommendation-card">
-                          <div className="category-label">🎵 music</div>
-                          <h2 className="item-title">{recommendations.music.title}</h2>
-                          <p className="item-description">{recommendations.music.extraInfo}</p>
-                          <div className="item-tags-row">
-                            {renderTagBadge('stress', recommendations.music.stress)}
-                            {renderTagBadge('calm', recommendations.music.calm)}
-                            {renderTagBadge('attention', recommendations.music.attention)}
+
+                      <div className="flex items-center justify-between border-t border-outline-variant/20 pt-4 mt-6">
+                        <button 
+                          onClick={() => handleSoundPlayToggle(scape.name)}
+                          className={`font-meta-technical text-[10px] uppercase tracking-wider font-bold transition-all px-4 py-2 border rounded-full ${
+                            playingSound === scape.name 
+                              ? 'bg-secondary text-on-secondary border-secondary'
+                              : 'border-outline-variant text-on-surface hover:border-secondary hover:text-secondary'
+                          }`}
+                        >
+                          {playingSound === scape.name ? 'Playing' : 'Activate'}
+                        </button>
+                        
+                        {playingSound === scape.name && (
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 bg-secondary rounded-full animate-ping" />
+                            <span className="font-meta-technical text-[9px] text-secondary uppercase">Streaming</span>
                           </div>
-                        </div>
-                      </div>
-                      {/* Movie — bottom-right */}
-                      <div className="bento-secondary card-stagger-3">
-                        <div className="recommendation-card">
-                          <div className="category-label">🎬 movie</div>
-                          <h2 className="item-title">{recommendations.movie.title}</h2>
-                          <p className="item-description">{recommendations.movie.extraInfo}</p>
-                          {recommendations.movie.whyThisPick && (
-                            <p className="item-why" style={{
-                              marginTop: '0.6rem',
-                              fontSize: '0.78rem',
-                              color: 'var(--text-2)',
-                              fontStyle: 'italic',
-                              lineHeight: 1.4,
-                              borderTop: '1px solid rgba(255,255,255,0.07)',
-                              paddingTop: '0.5rem',
-                            }}>{recommendations.movie.whyThisPick}</p>
-                          )}
-                          <div className="item-tags-row">
-                            {renderTagBadge('stress', recommendations.movie.stress)}
-                            {renderTagBadge('calm', recommendations.movie.calm)}
-                            {renderTagBadge('attention', recommendations.movie.attention)}
-                          </div>
-                        </div>
+                        )}
                       </div>
                     </div>
-
-                    {/* 4. Ask again button */}
-                    <div className="ask-again-wrapper fade-up">
-                      <button onClick={handleReset} className="ask-again-btn">start over</button>
-                    </div>
-
                   </div>
-                )
-              )}
-            </>
-          )}
-        </div>
+                ))}
+              </div>
 
-        {/* Global Footer (Screen 1 only) */}
-        {currentPage === 'home' && driftStep !== 'results' && !isLoading && (
-          <footer className="site-footer">
-            <div className="footer-inner">
-              <span className="footer-text">drift · final year project · 2025</span>
-              <span className="footer-text">node.js · express · mongodb · onnx</span>
             </div>
-          </footer>
+          </div>
         )}
-        </>
+
+        {/* TAB 4: ABOUT / PHILOSOPHY */}
+        {activeTab === 'about' && (
+          <div className="w-full max-w-3xl py-12 px-6 md:px-margin-desktop fade-in z-10 relative">
+            <header className="mb-16 border-b border-outline-variant/30 pb-6">
+              <span className="font-meta-technical text-[11px] text-secondary uppercase tracking-[0.2em] mb-2 block">MANIFESTO // DRIFT</span>
+              <h1 className="font-display-lg text-display-lg-mobile md:text-display-lg text-primary leading-none mb-3">Cinematic Wellness</h1>
+              <p className="text-on-surface-variant text-body-lg">Moving away from the sterile trackers toward a soulful, immersive digital aesthetic.</p>
+            </header>
+
+            <article className="space-y-12 font-light text-on-surface-variant text-body-lg leading-relaxed">
+              <section className="space-y-4">
+                <h3 className="font-headline-sm text-headline-sm text-primary font-medium">The Curse of Choice</h3>
+                <p>
+                  Modern digital systems thrive on endless scroll and aggregate grids. They bombard you with dozens of recommendations, assuming that more options equate to a better experience. We believe this introduces choice paralysis—a hidden cognitive tax that exhausts your attention before you've even hit play.
+                </p>
+              </section>
+
+              <section className="space-y-4">
+                <h3 className="font-headline-sm text-headline-sm text-primary font-medium">Attention as a Finite Asset</h3>
+                <p>
+                  Drift operates under a simple guideline: we recommend exactly <strong>one</strong> curated pick per session. We assess your mental bandwidth using a hybrid two-stage engine that aligns collaborative filtering with real-time mood context, ensuring your entertainment selection fits your current capability.
+                </p>
+              </section>
+
+              <section className="space-y-4">
+                <h3 className="font-headline-sm text-headline-sm text-primary font-medium">Glassmorphism & Depth Aesthetics</h3>
+                <p>
+                  Our UI uses dark, nocturnal base layers to soothe eye strain, paired with translucent glass containers and WebGL noise canvases. The design draws inspiration from classic typography and film editorials. Drift is designed to help you settle down and disengage from constant feedback loops.
+                </p>
+              </section>
+            </article>
+          </div>
         )}
-      </div>
+
+        {/* TAB 5: PROFILE & AUTHENTICATION */}
+        {activeTab === 'profile' && (
+          <div className="w-full max-w-xl py-12 px-6 fade-in z-10 relative">
+            {isLoggedIn ? (
+              <div className="glass-card rounded-[32px] p-8 md:p-12 border border-outline-variant/30 relative flex flex-col items-center text-center animate-settle">
+                <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-secondary"></div>
+                <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-secondary"></div>
+                
+                <span className="material-symbols-outlined text-4xl text-secondary mb-4">account_circle</span>
+                <span className="font-meta-technical text-[9px] text-outline uppercase tracking-widest block mb-1">User profile status</span>
+                <h2 className="font-display-lg text-headline-md text-primary mb-2">{userName}</h2>
+                <p className="text-[12px] text-on-surface-variant font-meta-technical mb-8">{userEmail}</p>
+
+                <div className="border-t border-outline-variant/30 pt-8 w-full space-y-4">
+                  <button 
+                    onClick={() => setActiveTab('progress')}
+                    className="w-full py-4 bg-white/5 border border-outline-variant hover:border-secondary hover:text-secondary font-meta-technical text-[11px] uppercase tracking-wider transition-all"
+                  >
+                    View Analytics Dashboard
+                  </button>
+                  <button 
+                    onClick={handleLogout}
+                    className="w-full py-4 border border-error/50 text-error hover:bg-error/5 font-meta-technical text-[11px] uppercase tracking-wider transition-all"
+                  >
+                    Disconnect Session
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="glass-card rounded-[32px] p-8 md:p-12 border border-outline-variant/30 relative animate-settle">
+                <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-secondary"></div>
+                <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-secondary"></div>
+                
+                <div className="text-center mb-8">
+                  <span className="font-meta-technical text-[10px] text-secondary uppercase tracking-widest block mb-2">ARCHIVE // AUTHSYS</span>
+                  <h2 className="font-display-lg text-headline-md text-primary">
+                    {authStep === 'login' ? 'Sign In' : authStep === 'signup' ? 'Create Account' : 'Reset Access'}
+                  </h2>
+                </div>
+
+                <form onSubmit={handleAuthSubmit} className="space-y-6">
+                  {authStep === 'signup' && (
+                    <div className="space-y-2">
+                      <label className="font-meta-technical text-[9px] text-outline uppercase">NAME</label>
+                      <input 
+                        type="text" 
+                        value={authName}
+                        onChange={(e) => setAuthName(e.target.value)}
+                        placeholder="Your Name"
+                        className="w-full bg-white/3 border border-outline-variant rounded-xl p-3 text-sm focus:border-secondary focus:ring-0 text-on-surface font-light outline-none"
+                      />
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <label className="font-meta-technical text-[9px] text-outline uppercase">EMAIL ADDRESS</label>
+                    <input 
+                      type="email" 
+                      value={authEmail}
+                      onChange={(e) => setAuthEmail(e.target.value)}
+                      placeholder="name@domain.com"
+                      className="w-full bg-white/3 border border-outline-variant rounded-xl p-3 text-sm focus:border-secondary focus:ring-0 text-on-surface font-light outline-none"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="font-meta-technical text-[9px] text-outline uppercase">PASSWORD</label>
+                    <div className="relative flex items-center">
+                      <input 
+                        type={showPassword ? 'text' : 'password'} 
+                        value={authPassword}
+                        onChange={(e) => setAuthPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full bg-white/3 border border-outline-variant rounded-xl p-3 text-sm focus:border-secondary focus:ring-0 text-on-surface font-light outline-none pr-12"
+                      />
+                      <button 
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 text-outline/50 hover:text-on-surface-variant transition-colors focus:outline-none"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">
+                          {showPassword ? 'visibility_off' : 'visibility'}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {authStep === 'signup' && (
+                    <div className="space-y-2">
+                      <label className="font-meta-technical text-[9px] text-outline uppercase">CONFIRM PASSWORD</label>
+                      <input 
+                        type="password" 
+                        value={authConfirmPassword}
+                        onChange={(e) => setAuthConfirmPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full bg-white/3 border border-outline-variant rounded-xl p-3 text-sm focus:border-secondary focus:ring-0 text-on-surface font-light outline-none"
+                      />
+                    </div>
+                  )}
+
+                  {authError && (
+                    <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl font-meta-technical text-center">
+                      ⚠️ {authError}
+                    </div>
+                  )}
+
+                  <button 
+                    type="submit" 
+                    disabled={authLoading}
+                    className="w-full py-4 bg-secondary text-on-secondary font-meta-technical text-[11px] font-bold uppercase tracking-widest border border-secondary hover:bg-white transition-all select-none"
+                  >
+                    {authLoading ? 'Compiling Access...' : authStep === 'login' ? 'ESTABLISH SESSION' : 'REGISTER Snaps'}
+                  </button>
+                </form>
+
+                <div className="mt-8 border-t border-outline-variant/30 pt-6 flex justify-between text-[11px] font-meta-technical text-outline uppercase">
+                  {authStep === 'login' ? (
+                    <>
+                      <button onClick={() => setAuthStep('signup')} className="hover:text-secondary">Register account</button>
+                      <button onClick={() => setAuthStep('forgot')} className="hover:text-secondary">Forgot pass</button>
+                    </>
+                  ) : (
+                    <button onClick={() => setAuthStep('login')} className="hover:text-secondary mx-auto">Return to Sign In</button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+      </main>
     </div>
   );
 }

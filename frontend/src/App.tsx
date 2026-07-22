@@ -869,9 +869,9 @@ export default function App() {
                           </h1>
                           
                           <div className="flex items-center gap-3 font-meta-technical text-[11px] text-outline uppercase tracking-wider">
-                            <span>MOVIE PICK</span>
+                            <span>PRIMARY TV SHOW</span>
                             <span className="w-1.5 h-1.5 bg-outline-variant rounded-full" />
-                            <span>{recommendations.movie.genres?.join(' / ') || 'Film'}</span>
+                            <span>{recommendations.movie.genres?.join(' / ') || 'TV Show'}</span>
                           </div>
                         </div>
 

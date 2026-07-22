@@ -1,0 +1,335 @@
+<!DOCTYPE html><html class="dark" lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&amp;family=Hanken+Grotesk:wght@400;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed": "#6bff8f",
+                      "surface-variant": "#2f353c",
+                      "on-tertiary-fixed-variant": "#005321",
+                      "on-primary-fixed": "#140067",
+                      "surface-tint": "#c5c0ff",
+                      "primary-container": "#8b82f6",
+                      "on-background": "#dde3eb",
+                      "on-primary-container": "#21068a",
+                      "inverse-primary": "#584ebf",
+                      "primary": "#c5c0ff",
+                      "on-secondary-fixed-variant": "#005048",
+                      "surface-container-high": "#242b31",
+                      "on-primary": "#281590",
+                      "secondary-container": "#04b4a2",
+                      "outline": "#928f9e",
+                      "tertiary": "#4ae176",
+                      "secondary-fixed-dim": "#4fdbc8",
+                      "on-secondary-container": "#003f38",
+                      "surface-dim": "#0e141a",
+                      "surface": "#0e141a",
+                      "on-surface": "#dde3eb",
+                      "on-tertiary-fixed": "#002109",
+                      "on-secondary": "#003731",
+                      "primary-fixed-dim": "#c5c0ff",
+                      "surface-container-highest": "#2f353c",
+                      "tertiary-container": "#00a74b",
+                      "inverse-on-surface": "#2b3137",
+                      "secondary": "#4fdbc8",
+                      "on-tertiary": "#003915",
+                      "on-secondary-fixed": "#00201c",
+                      "on-surface-variant": "#c8c4d5",
+                      "error": "#ffb4ab",
+                      "secondary-fixed": "#71f8e4",
+                      "surface-container-lowest": "#080f14",
+                      "surface-container": "#1a2026",
+                      "outline-variant": "#474553",
+                      "on-tertiary-container": "#003111",
+                      "on-error-container": "#ffdad6",
+                      "error-container": "#93000a",
+                      "background": "#0e141a",
+                      "surface-container-low": "#161c22",
+                      "on-error": "#690005",
+                      "on-primary-fixed-variant": "#4034a6",
+                      "surface-bright": "#333a40",
+                      "tertiary-fixed-dim": "#4ae176",
+                      "primary-fixed": "#e3dfff",
+                      "inverse-surface": "#dde3eb"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "section-gap": "4rem",
+                      "grid-margin": "2rem",
+                      "element-gap": "1.5rem",
+                      "hairline": "1px",
+                      "grid-gutter": "1rem"
+              },
+              "fontFamily": {
+                      "headline-md": ["Playfair Display"],
+                      "body-md": ["Hanken Grotesk"],
+                      "body-lg": ["Hanken Grotesk"],
+                      "label-sm": ["Hanken Grotesk"],
+                      "display-lg": ["Playfair Display"],
+                      "meta-technical": ["JetBrains Mono"],
+                      "display-lg-mobile": ["Playfair Display"]
+              },
+              "fontSize": {
+                      "headline-md": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                      "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "700"}],
+                      "meta-technical": ["13px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "display-lg-mobile": ["40px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    }catch(_e){}</script><meta charset="utf-8"></head><body class="bg-background text-on-background font-body-md selection:bg-primary selection:text-on-primary-container min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="sticky top-0 flex justify-between items-center px-grid-margin py-4 w-full z-50 border-b border-outline-variant bg-background">
+<div class="font-display-lg text-[24px] uppercase tracking-widest text-on-surface leading-none">Drift</div>
+<nav class="hidden md:flex items-center space-x-8"><a class="text-on-surface-variant font-meta-technical text-meta-technical hover:text-primary transition-colors duration-200" href="#">Home</a><a class="text-on-surface-variant font-meta-technical text-meta-technical hover:text-primary transition-colors duration-200" href="#">Progress</a><a class="text-on-surface-variant font-meta-technical text-meta-technical hover:text-primary transition-colors duration-200" href="#">About</a><a class="text-on-surface-variant font-meta-technical text-meta-technical hover:text-primary transition-colors duration-200" href="#">Profile</a></nav>
+<div class="flex items-center gap-4">
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="search">search</span></button>
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="account_circle">account_circle</span></button>
+</div>
+</header>
+<main class="flex-grow">
+<!-- Hero Section -->
+<section class="relative min-h-[85vh] flex items-center overflow-hidden border-b border-outline-variant">
+<!-- Background Key-->
+<div class="absolute inset-0 w-full h-full z-0">
+<div class="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-transparent z-10"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10"></div>
+<div class="w-full h-full bg-cover bg-right" data-alt="A cinematic, atmospheric landscape from the film Arrival featuring a massive, monolithic black spacecraft hovering silently over a mist-shrouded green valley. The lighting is overcast and diffused, creating a somber, intellectual, and high-contrast mood in deep navies and muted earthy tones. The composition is epic and minimalist, echoing the Brutalist editorial style of the interface." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAhV4OhRLVKYQWWeobYNtDOY9O5L_SaDqQY73MSe6LaIxvH0utdCheg5azK70K4T9HMMvwC1IgmSPeBVOSpjPaM-69YnTGRxigtBmb2PWQxcCgdbNTOH1FGrzlvXX0IGFv-W3t4wSIeyirc2HcySrTDcZHZbYXoaisQGBEq5di3uou5X2ofpV3cYvsOdyCNXz8qe2vW2I1KZwbXRs57u20Xp-WfiB-_GhZ7SlGVXj8pNNuPm_c1A2vuMI8MR8aZRJwKbXB6Wnh6Glw6')"></div>
+</div>
+<!-- Content Overlay -->
+<div class="relative z-20 w-full max-w-7xl mx-auto px-grid-margin grid grid-cols-12 gap-grid-gutter">
+<div class="col-span-12 md:col-span-8 lg:col-span-6 flex flex-col justify-center">
+<div class="mb-2">
+<span class="font-meta-technical text-meta-technical text-tertiary px-2 py-1 border border-tertiary/30 bg-tertiary/5 uppercase">CURATOR'S DAILY PICK</span>
+</div>
+<h1 class="font-display-lg text-display-lg-mobile md:text-display-lg mb-4 text-on-surface leading-none">Arrival</h1>
+<div class="flex items-center gap-4 font-meta-technical text-meta-technical text-on-surface-variant mb-8 uppercase">
+<span class="">2016</span>
+<span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+<span class="">1H 56M</span>
+<span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+<span class="">Sci-Fi / Drama</span>
+</div>
+<!-- Metadata Rows -->
+<div class="flex flex-wrap gap-4 mb-10">
+<div class="flex items-center gap-2 border border-outline-variant p-2 group hover:border-primary transition-colors">
+<span class="font-meta-technical text-[10px] text-outline">IMDB</span>
+<span class="font-meta-technical text-meta-technical text-on-surface">[ 7.9 <span class="text-outline">/ 10</span> ]</span>
+</div>
+<div class="flex items-center gap-2 border border-outline-variant p-2 group hover:border-primary transition-colors">
+<span class="font-meta-technical text-[10px] text-outline">ROTTEN TOM.</span>
+<span class="font-meta-technical text-meta-technical text-on-surface text-tertiary">[ 94% FRESH ]</span>
+</div>
+<div class="flex items-center gap-2 border border-outline-variant p-2 group hover:border-primary transition-colors">
+<span class="font-meta-technical text-[10px] text-outline">LETTERBOXD</span>
+<span class="font-meta-technical text-meta-technical text-on-surface">[ 4.1 <span class="text-outline">/ 5.0</span> ]</span>
+</div>
+</div><div class="mt-4 flex flex-col items-start">
+<button class="font-meta-technical text-[11px] text-outline hover:text-primary transition-colors uppercase tracking-widest cursor-pointer" onclick="this.nextElementSibling.classList.toggle('hidden'); this.classList.add('hidden')">
+    Not what you want?
+  </button>
+<div class="hidden w-full max-w-md mt-2 transition-all duration-500 animate-in fade-in">
+<div class="relative flex items-center border border-outline-variant focus-within:border-primary transition-colors">
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-meta-technical text-meta-technical p-3 placeholder:text-outline/50" placeholder="No worries, try again." type="text">
+<button class="px-4 text-primary hover:text-secondary transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="max-w-md">
+<h3 class="font-meta-technical text-meta-technical text-primary uppercase mb-3 flex items-center gap-2">
+<span class="w-8 h-[1px] bg-primary"></span> Why this pick
+                        </h3>
+<p class="font-headline-md text-[20px] leading-relaxed italic text-on-surface-variant font-light mb-8">
+                            "We sensed you were looking for something that demands deep attention but rewards it with quiet, intellectual resonance. Villeneuve's masterpiece operates on a frequency of pure atmospheric tension, matching the 'Settled' state you described."
+                        </p>
+</div>
+<div class="flex flex-wrap gap-4">
+<button class="bg-primary text-on-primary-container px-8 py-4 font-meta-technical flex items-center gap-3 active:scale-95 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                            START WATCHING
+                        </button>
+<button class="border border-outline-variant text-on-surface px-8 py-4 font-meta-technical hover:bg-surface-variant transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined">add</span>
+                            ADD TO ARCHIVE
+                        </button>
+</div><div class="mt-4 flex flex-col items-start">
+<button class="font-meta-technical text-[11px] text-outline hover:text-primary transition-colors uppercase tracking-widest cursor-pointer" onclick="this.nextElementSibling.classList.toggle('hidden'); this.classList.add('hidden')">
+    Not what you want?
+  </button>
+<div class="hidden w-full max-w-md mt-2 transition-all duration-500 animate-in fade-in">
+<div class="relative flex items-center border border-outline-variant focus-within:border-primary transition-colors">
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-meta-technical text-meta-technical p-3 placeholder:text-outline/50" placeholder="No worries, try again." type="text">
+<button class="px-4 text-primary hover:text-secondary transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Technical Analysis Section -->
+<section class="py-section-gap px-grid-margin max-w-7xl mx-auto">
+<div class="grid grid-cols-12 gap-grid-gutter border-b border-outline-variant pb-6 mb-12">
+<div class="col-span-12 md:col-span-4">
+<h2 class="font-display-lg text-headline-md uppercase text-on-surface leading-tight">Cast &amp; Personnel</h2>
+<p class="font-meta-technical text-meta-technical text-on-surface-variant mt-2">TECHNICAL ARCHIVE REF: #4402-B</p>
+</div>
+<div class="col-span-12 md:col-span-8 flex items-end justify-end">
+<div class="flex gap-2">
+<button class="w-10 h-10 border border-outline-variant flex items-center justify-center hover:border-primary transition-colors"><span class="material-symbols-outlined">chevron_left</span></button>
+<button class="w-10 h-10 border border-outline-variant flex items-center justify-center hover:border-primary transition-colors"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-grid-gutter">
+<!-- Person Card 1 -->
+<div class="border border-outline-variant bg-surface-container-lowest overflow-hidden group">
+<div class="h-48 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="A portrait of actress Amy Adams with a focused, intelligent expression, styled in a dark, moody editorial photography look. The lighting is dramatic side-lighting with deep shadows, fitting a high-end cinematic magazine aesthetic. The background is a textured deep gray." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAjdpeqmrgwqMJdYMMZ4D0BuwNlW-PC2iSd2kTzvjkQMjLwD9VTeZcNLMhe_mDIU0NXLr8i-CkOIgcRcChB4HNKxBzbdCkLYXj7sPKiPSjsE8pP5AGOF9ERp_tdpg6jHEqxqdxfFGNXtcHBSE9c0IoBSGeVKbsmoqaAL7fkEWK5ql93UI-hUctSsefCM_j_ysJRcJeYrWJcyRXvs49KwNIUWMs3BPzvl63DqpXhfKXMtpJt3NNvAGGYoUClsABXuVw9S4vdcoLYm5F8')"></div>
+<div class="p-4 border-t border-outline-variant">
+<span class="font-meta-technical text-[10px] text-tertiary block mb-1">PROTAGONIST</span>
+<h4 class="font-headline-md text-[18px] text-on-surface">Amy Adams</h4>
+<p class="font-meta-technical text-meta-technical text-outline mt-1 uppercase">Dr. Louise Banks</p>
+</div>
+</div>
+<!-- Person Card 2 -->
+<div class="border border-outline-variant bg-surface-container-lowest overflow-hidden group">
+<div class="h-48 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="A portrait of actor Jeremy Renner looking contemplative, rendered in high-contrast black and white editorial style. Sharp focus on eyes, dramatic cinematic lighting. The image captures a technical, serious mood consistent with the film's atmosphere." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuArsGuA1ESDRGuvoqZUUs61yP_3Z2yHSjU_m3d_ERrHyKpOvajmJsefXcBmTOrUJ_PJSMz3bwbiWiDtE_hruA391CcilF_Jg-XyZ4s2GMLfx_2NU5HaRXL1NvZFZ_66Shsv3P_MiQwuqt-vFPVWOqhB5xM6EqFa27qKPDKXqnMfxDfVk1y4yxkiNqHERQvn_TO6FofANuL7zwHDRU3jYGvGrn61zuQYQ36OrMVWl5N_Fx7X91h_AylY0qoqazHfV4Or48UMTzYLEnO3')"></div>
+<div class="p-4 border-t border-outline-variant">
+<span class="font-meta-technical text-[10px] text-outline block mb-1">SUPPORT</span>
+<h4 class="font-headline-md text-[18px] text-on-surface">Jeremy Renner</h4>
+<p class="font-meta-technical text-meta-technical text-outline mt-1 uppercase">Ian Donnelly</p>
+</div>
+</div>
+<!-- Person Card 3 -->
+<div class="border border-outline-variant bg-surface-container-lowest overflow-hidden group">
+<div class="h-48 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="A portrait of actor Forest Whitaker in a commanding pose, styled for a high-end cinema publication. High contrast, low-key lighting, deep navy and slate tones. The aesthetic is rigorous and professional." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA32zI1E9YuZ3_ZMtqN86dWzvCmQtidpPFBPdWU2XESrqcICJFeggG7CWmQ-gwQ-BjzLc_WviB46nlLhgm6xhAHGQto5PraBSXy6uvrsByLrmi0VMuuG3C-xJXZl6EmiNVMlKC4vlGxYg11AvezLQN24TUhF4aQiQ16AB8DCFDOtLtXAbmAgoXzv3tc9IsqknnH-msOvHSejOvjuo2eECpxbso0hs4P8GAihV8hGYo1YCgMKpo9r9t21sQvPKlJh7lBqFS2c21Gejai')"></div>
+<div class="p-4 border-t border-outline-variant">
+<span class="font-meta-technical text-[10px] text-outline block mb-1">SUPPORT</span>
+<h4 class="font-headline-md text-[18px] text-on-surface">Forest Whitaker</h4>
+<p class="font-meta-technical text-meta-technical text-outline mt-1 uppercase">Colonel Weber</p>
+</div>
+</div>
+<!-- Person Card 4 -->
+<div class="border border-outline-variant bg-surface-container-lowest overflow-hidden group">
+<div class="h-48 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="A portrait of director Denis Villeneuve, looking directly at the camera with an intense, creative gaze. Editorial lighting with sharp shadows, monochromatic palette with slight blue tint. The visual style is intellectual and authoritative." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB9vmlQDk9_847fCdvocuT6bzq5YqPTj5HERoJN-4umzY9__Gwycj7zLmP7Uvic95vbeuRfKZloU5scD2oCYg0SNf4OI913oDfjAfk2IIU30JBwawnbJEQGYHbUUP7F3zkI78SDvlBKMRHAfU7McjLQrcbmlpAUVXAy40YRqqng8RR5jotB59twdSSmVZyDSpWmqDH5kveT7GDVxY1eTektIKzX0pAsnuy_L1-sydvOSrNhfrOG3w9a-bV-9xSDivha9E6L417v4uFk')"></div>
+<div class="p-4 border-t border-outline-variant">
+<span class="font-meta-technical text-[10px] text-primary block mb-1">DIRECTOR</span>
+<h4 class="font-headline-md text-[18px] text-on-surface">Denis Villeneuve</h4>
+<p class="font-meta-technical text-meta-technical text-outline mt-1 uppercase">Film Direction</p>
+</div>
+</div>
+</div>
+<!-- Additional Detail Rows -->
+<div class="mt-24 grid grid-cols-12 gap-grid-gutter">
+<div class="col-span-12 lg:col-span-4 space-y-8">
+<div class="border-l border-primary pl-6">
+<h5 class="font-meta-technical text-meta-technical text-primary uppercase mb-2">Technical specs</h5>
+<div class="space-y-2">
+<div class="flex justify-between border-b border-outline-variant/30 py-1">
+<span class="text-outline text-[12px] uppercase">Format</span>
+<span class="font-meta-technical text-meta-technical">2.39 : 1</span>
+</div>
+<div class="flex justify-between border-b border-outline-variant/30 py-1">
+<span class="text-outline text-[12px] uppercase">Audio</span>
+<span class="font-meta-technical text-meta-technical">Dolby Atmos</span>
+</div>
+<div class="flex justify-between border-b border-outline-variant/30 py-1">
+<span class="text-outline text-[12px] uppercase">Color</span>
+<span class="font-meta-technical text-meta-technical">Technicolor</span>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-8">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-grid-gutter">
+<div class="border border-outline-variant p-6 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2 opacity-20">
+<span class="material-symbols-outlined text-[48px]">auto_awesome</span>
+</div>
+<h5 class="font-meta-technical text-meta-technical text-tertiary mb-4 uppercase tracking-widest">Editorial Insight</h5>
+<p class="font-body-md text-on-surface-variant italic">"A linguistic puzzle box that uses sci-fi tropes to explore the very nature of human grief and the perception of time."</p>
+</div>
+<div class="border border-outline-variant p-6 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2 opacity-20">
+<span class="material-symbols-outlined text-[48px]">monitoring</span>
+</div>
+<h5 class="font-meta-technical text-meta-technical text-secondary mb-4 uppercase tracking-widest">Pace Analysis</h5>
+<div class="w-full h-8 flex items-end gap-1">
+<div class="w-full bg-secondary/10 h-1"></div>
+<div class="w-full bg-secondary/20 h-2"></div>
+<div class="w-full bg-secondary/30 h-3"></div>
+<div class="w-full bg-secondary/40 h-4"></div>
+<div class="w-full bg-secondary/50 h-5"></div>
+<div class="w-full bg-secondary/60 h-6"></div>
+<div class="w-full bg-secondary/70 h-5"></div>
+<div class="w-full bg-secondary/60 h-4"></div>
+<div class="w-full bg-secondary/80 h-8"></div>
+<div class="w-full bg-secondary/90 h-7"></div>
+</div>
+<p class="font-meta-technical text-[10px] text-outline mt-2 uppercase">Atmospheric Build / High intellectual engagement</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="grid grid-cols-12 gap-grid-gutter px-grid-margin py-section-gap w-full mt-auto border-t border-outline-variant bg-surface-container-lowest">
+<div class="col-span-12 lg:col-span-4">
+<div class="font-display-lg text-[24px] text-on-surface uppercase mb-4 leading-none">Drift</div>
+<p class="text-on-surface-variant font-meta-technical text-[11px] uppercase tracking-widest opacity-60">Architects of intellectual curation.</p>
+</div>
+<div class="col-span-12 md:col-span-4 lg:col-span-4 flex flex-col gap-2">
+<h6 class="font-meta-technical text-meta-technical text-tertiary mb-2 uppercase">NAVIGATION</h6>
+<div class="flex flex-wrap gap-x-6 gap-y-2">
+<a class="text-on-surface-variant font-meta-technical text-meta-technical hover:text-secondary underline decoration-hairline transition-all" href="#">Editorial Policy</a>
+<a class="text-on-surface-variant font-meta-technical text-meta-technical hover:text-secondary underline decoration-hairline transition-all" href="#">Privacy</a>
+<a class="text-on-surface-variant font-meta-technical text-meta-technical hover:text-secondary underline decoration-hairline transition-all" href="#">Terms</a>
+<a class="text-on-surface-variant font-meta-technical text-meta-technical hover:text-secondary underline decoration-hairline transition-all" href="#">API Access</a>
+<a class="text-on-surface-variant font-meta-technical text-meta-technical hover:text-secondary underline decoration-hairline transition-all" href="#">Contact</a>
+</div>
+</div>
+<div class="col-span-12 md:col-span-8 lg:col-span-4 flex flex-col items-start lg:items-end justify-between">
+<div class="text-right">
+<p class="font-meta-technical text-meta-technical text-on-surface-variant">CURRENT SESSION: EST. 2024</p>
+</div>
+<p class="text-on-surface-variant font-meta-technical text-[10px] mt-8 uppercase">© 2024 DRIFT EDITORIAL. ALL RIGHTS RESERVED.</p>
+</div>
+</footer>
+<script>
+        // Micro-interactions for metadata boxes
+        document.querySelectorAll('.group').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                item.classList.add('scale-[1.01]');
+            });
+            item.addEventListener('mouseleave', () => {
+                item.classList.remove('scale-[1.01]');
+            });
+        });
+
+        // Simple parallax for hero
+        window.addEventListener('scroll', () => {
+            const scroll = window.scrollY;
+            const heroImage = document.querySelector('.bg-cover');
+            if (heroImage) {
+                heroImage.style.transform = `translateY(${scroll * 0.15}px)`;
+            }
+        });
+    </script>
+
+
+
+
+</body></html>

@@ -215,6 +215,21 @@ def main():
     test_set   = cf_data['test_set']         # [{userId, movieId}, ...]
     candidates = cf_data['candidates']       # {uid_str: [{movieId, score}]}
     stats      = cf_data['stats']
+    user_to_idx = cf_data.get('user_to_idx', {})
+    movie_to_idx = cf_data.get('movie_to_idx', {})
+    idx_to_movie = {v: int(k) for k, v in movie_to_idx.items()}
+
+    # Load ALS factors if available (enables full-catalog dot-product scoring)
+    factors_path_u = 'src/data/user_factors.npy'
+    factors_path_i = 'src/data/item_factors.npy'
+    user_factors = None
+    item_factors = None
+    if os.path.exists(factors_path_u) and os.path.exists(factors_path_i):
+        user_factors = np.load(factors_path_u)
+        item_factors = np.load(factors_path_i)
+        print(f'  ALS factors loaded: user_factors {user_factors.shape}, item_factors {item_factors.shape}')
+    else:
+        print('  WARNING: ALS factors not found — falling back to truncated candidate lists.')
 
     print(f'  cf_candidates  : {len(test_set)} test users, '
           f'{len(candidates)} candidate lists')
@@ -317,28 +332,38 @@ def main():
         return {m: float(popularity.get(m, 0)) for m in items}
 
     def score_cf(q, items):
+        """Score using full ALS dot-product if factors available, else truncated candidates."""
+        if user_factors is not None:
+            uid = q['userId']
+            u_idx = user_to_idx.get(str(uid))
+            if u_idx is not None and u_idx < len(user_factors):
+                u_vec = user_factors[u_idx]  # shape: (factors,)
+                scores = {}
+                for m in items:
+                    m_idx = movie_to_idx.get(str(m))
+                    if m_idx is not None and m_idx < len(item_factors):
+                        scores[m] = float(np.dot(u_vec, item_factors[m_idx]))
+                    else:
+                        scores[m] = 0.0
+                return scores
+        # Fallback: truncated candidate list
         score_map = {c['movieId']: c['score']
                      for c in candidates.get(str(q['userId']), [])}
         return {m: score_map.get(m, 0.0) for m in items}
 
     def score_hybrid(q, items, alpha):
-        cands = candidates.get(str(q['userId']), [])
-        cf_raw = {c['movieId']: c['score'] for c in cands}
+        cf_scores_raw = score_cf(q, items)
 
-        # Normalise CF scores using the top-50 range
-        top50_scores = [c['score'] for c in cands]
-        min_cf = min(top50_scores) if top50_scores else 0.0
-        max_cf = max(top50_scores) if top50_scores else 1.0
+        # Normalise CF scores over the 100-item pool
+        all_cf = list(cf_scores_raw.values())
+        min_cf = min(all_cf) if all_cf else 0.0
+        max_cf = max(all_cf) if all_cf else 1.0
         cf_range = max_cf - min_cf if max_cf > min_cf else 1.0
 
         qv = q['query_vec']
         result = {}
         for m in items:
-            # CF: use normalised score if in top-50, else 0
-            if m in cf_raw:
-                cf_norm = max(0.0, (cf_raw[m] - min_cf) / cf_range)
-            else:
-                cf_norm = 0.0
+            cf_norm = max(0.0, (cf_scores_raw.get(m, 0.0) - min_cf) / cf_range)
 
             # Mood similarity via cosine
             mv = movie_vectors.get(m)
@@ -393,16 +418,42 @@ def main():
     print(f'  {"Full Hybrid (α="+str(best_alpha)+")":<32} {best_res["HR@1"]*100:>5.2f}%  {best_res["HR@10"]*100:>5.2f}%  {best_res["NDCG@10"]:>9.4f}')
     print(f'{"=" * 62}\n')
 
-    # ── Update recommender_assets.json with new best alpha ────────────────────
+    # ── Build lean deployment assets (recommender_assets.json) ────────────────
+    print('\nBuilding deployment assets (recommender_assets.json)...')
+
+    popularity_fallback = cf_data.get('popularity_fallback', [])
+
+    # Prune movie_features to only movies referenced in candidates + popularity fallback
+    referenced_mids = set()
+    for cand_list in candidates.values():
+        for c in cand_list:
+            referenced_mids.add(str(c['movieId']))
+    for c in popularity_fallback:
+        referenced_mids.add(str(c['movieId']))
+
+    pruned_mf = {mid: feats for mid, feats in mf.items() if mid in referenced_mids}
+    print(f'  Pruned movie features: {len(mf)} → {len(pruned_mf)} referenced shows')
+
+    deployment_assets = {
+        'alpha': best_alpha,
+        'genres': ALL_GENRES,
+        'movie_features': pruned_mf,
+        'candidates': candidates,
+        'popularity_fallback': popularity_fallback,
+        'user_to_idx': user_to_idx,
+        'movie_to_idx': movie_to_idx,
+    }
+
+    # Embed factor arrays as lists if available (for serve-time dot product)
+    if user_factors is not None:
+        deployment_assets['user_factors_path'] = 'src/data/user_factors.npy'
+        deployment_assets['item_factors_path'] = 'src/data/item_factors.npy'
+
     assets_path = 'src/data/recommender_assets.json'
-    if os.path.exists(assets_path):
-        print(f'Updating recommender_assets.json  alpha: {cf_data.get("alpha", "?")} → {best_alpha}...')
-        with open(assets_path) as f:
-            assets = json.load(f)
-        assets['alpha'] = best_alpha
-        with open(assets_path, 'w') as f:
-            json.dump(assets, f)
-        print('  Done.')
+    print(f'  Writing {assets_path}...')
+    with open(assets_path, 'w') as f:
+        json.dump(deployment_assets, f)
+    print(f'  Saved: alpha={best_alpha}, {len(mf)} shows, {len(user_to_idx)} users')
 
     # ── Write updated report ──────────────────────────────────────────────────
     _write_report(

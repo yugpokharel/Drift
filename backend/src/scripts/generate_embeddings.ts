@@ -79,10 +79,17 @@ async function main() {
       
       const cachedData = cache[tmdbId.toString()];
       
-      // Use cached overview & runtime if available, otherwise construct offline synthetic description
-      const overview = cachedData?.overview || `A cinematic feature film titled ${movie.title} spanning genres like ${movie.genres.replace(/\|/g, ', ')}.`;
-      const runtime = cachedData?.runtime || (movie.genres.includes('Action') || movie.genres.includes('Drama') ? 120 : 95);
-      const releaseDate = cachedData?.release_date || movie.title.match(/\((\d{4})\)/)?.[1] || "2000";
+      // Use cached overview & runtime if available, then fall back to the
+      // overview stored in needed_movies (populated by train_cf.py from TV show data),
+      // and finally a synthetic description.
+      const overview = cachedData?.overview
+        || (movie as any).overview
+        || `A TV show titled ${movie.title} spanning genres like ${movie.genres.replace(/\|/g, ', ')}.`;
+      const runtime = cachedData?.runtime || 45; // TV episodes default to ~45 min
+      const releaseDate = (movie as any).releaseDate
+        || cachedData?.release_date
+        || movie.title.match(/\((\d{4})\)/)?.[1]
+        || "2020";
       
       let keywords: string[] = [];
       if (cachedData?.keywords?.keywords) {

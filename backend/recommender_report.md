@@ -69,7 +69,7 @@ query is now free of target-item information.
 - ALS trained on a **25,000-user random sample** (memory constraint on 16 GB RAM).
 - Leave-one-out split: each user's most recent rating by timestamp held out.
 - Evaluation sample: **300 users** with valid feature vectors and sufficient negative pool.
-- Negative sampling pool: 5,869 movies with pre-computed sentence
+- Negative sampling pool: 5,903 movies with pre-computed sentence
   embeddings, excluding each user's full rating history.
 
 ---
@@ -81,9 +81,9 @@ Each user's held-out item ranked against 99 randomly sampled unrated items:
 | Model | HR@1 | HR@10 | NDCG@10 |
 |:---|:---:|:---:|:---:|
 | Random baseline (theoretical) | 1.00% | 10.00% | 0.0454 |
-| **Popularity Baseline** | 12.00% | 53.33% | 0.3007 |
-| **CF-Only (ALS, Stage 1)** | 19.33% | 32.33% | 0.2626 |
-| **Full Hybrid (α = 0.7, Stage 1+2)** | 18.67% | 40.67% | 0.2880 |
+| **Popularity Baseline** | 13.67% | 53.00% | 0.3103 |
+| **CF-Only (ALS, Stage 1)** | 27.33% | 73.33% | 0.4821 |
+| **Full Hybrid (α = 0.5, Stage 1+2)** | 29.67% | 75.00% | 0.5116 |
 
 ---
 
@@ -93,13 +93,13 @@ $$\text{final\_score} = \alpha \cdot \text{CF\_norm} + (1 - \alpha) \cdot \text{
 
 | α | HR@1 | HR@10 | NDCG@10 | |
 |:---:|:---:|:---:|:---:|:---|
-| 0.3 | 13.00% | 37.00% | 0.2329 |
-| 0.4 | 16.00% | 38.00% | 0.2553 |
-| 0.5 | 18.00% | 39.33% | 0.2726 |
-| 0.6 | 18.67% | 40.33% | 0.2829 |
-| 0.7 | 18.67% | 40.67% | 0.2880 |  ← selected
+| 0.3 | 26.67% | 66.00% | 0.4442 |
+| 0.4 | 30.00% | 70.00% | 0.4904 |
+| 0.5 | 29.67% | 75.00% | 0.5116 |  ← selected
+| 0.6 | 29.00% | 76.33% | 0.5102 |
+| 0.7 | 29.67% | 75.33% | 0.5062 |
 
-Best α = **0.7** (selected by NDCG@10 = 0.2880).
+Best α = **0.5** (selected by NDCG@10 = 0.5116).
 
 ---
 
@@ -141,7 +141,7 @@ evaluation would require a user study or live A/B test.
   embedding (384)] via `all-MiniLM-L6-v2`
 - Query vector built from (capacity, tone, context) with template sentence text
 - Re-ranking formula: α·CF_norm + (1−α)·cosine_mood_sim
-- Optimal α = **0.7** (by NDCG@10 on corrected evaluation)
+- Optimal α = **0.5** (by NDCG@10 on corrected evaluation)
 
 ---
 

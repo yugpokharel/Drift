@@ -99,15 +99,20 @@ def main():
     
     print("Training Alternating Least Squares (ALS) model...")
     model = AlternatingLeastSquares(
-        factors=64,
-        regularization=0.1,
-        iterations=15,
+        factors=128,
+        regularization=0.01,
+        iterations=25,
         random_state=42,
         num_threads=0
     )
     # Fit model
     model.fit(user_items)
     print("ALS model training completed.")
+    
+    # Save factors
+    np.save("src/data/user_factors.npy", model.user_factors)
+    np.save("src/data/item_factors.npy", model.item_factors)
+    print("Saved user and item factors to src/data/.")
     
     # Precompute popularity baseline
     print("Computing popularity baseline...")
@@ -198,24 +203,23 @@ def main():
     
     print(f"Total unique movies needing features/metadata: {len(all_needed_movie_ids):,}")
     
-    # Create movieId to TMDB mapping from links.csv
-    movie_links = links[links['movieId'].isin(all_needed_movie_ids)].copy()
-    movie_links['tmdbId'] = movie_links['tmdbId'].fillna(0).astype(int)
-    movie_links_dict = movie_links.set_index('movieId')['tmdbId'].to_dict()
-    
-    # Create movieId to title and genre mapping
-    movie_meta = movies[movies['movieId'].isin(all_needed_movie_ids)].copy()
-    movie_meta_dict = movie_meta.set_index('movieId').to_dict(orient='index')
+    # Load cached TV shows
+    tv_shows_path = "src/data/tmdb_tv_shows.json"
+    with open(tv_shows_path, "r") as f:
+        tv_shows = json.load(f)
+    print(f"Loaded {len(tv_shows)} TV shows for mapping.")
     
     needed_movies_metadata = {}
     for mid in all_needed_movie_ids:
-        meta = movie_meta_dict.get(mid, {"title": "Unknown", "genres": "Unknown"})
-        tmdb_id = movie_links_dict.get(mid, 0)
+        # Deterministic modulo mapping
+        show = tv_shows[mid % len(tv_shows)]
         needed_movies_metadata[str(mid)] = {
             "movieId": mid,
-            "tmdbId": int(tmdb_id),
-            "title": meta["title"],
-            "genres": meta["genres"]
+            "tmdbId": show["tmdbId"],
+            "title": show["title"],
+            "genres": "|".join(show["genres"]), # Keep standard delimiter format
+            "overview": show["overview"],
+            "releaseDate": show["releaseDate"]
         }
         
     # Construct target test set entries for Python hybrid evaluation
@@ -247,7 +251,9 @@ def main():
         "candidates": candidates_export,
         "needed_movies": needed_movies_metadata,
         "test_set": test_set_export,
-        "popularity_fallback": popularity_fallback
+        "popularity_fallback": popularity_fallback,
+        "user_to_idx": {str(k): int(v) for k, v in user_to_idx.items()},
+        "movie_to_idx": {str(k): int(v) for k, v in movie_to_idx.items()}
     }
     
     output_dir = "src/data"

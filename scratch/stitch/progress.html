@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Drift | Spectral Analysis Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #0A0E1A; /* Brand deep indigo */
+            color: #e1e3e4;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        .glass-card {
+            background: rgba(29, 32, 33, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .glass-card:hover {
+            border: 1px solid rgba(133, 213, 205, 0.15);
+            box-shadow: 0 0 40px rgba(133, 213, 205, 0.03);
+        }
+
+        .spectral-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: dash 3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: 0; }
+        }
+
+        @keyframes float {
+            0% { opacity: 0.3; transform: translateY(0px); }
+            50% { opacity: 0.6; transform: translateY(-5px); }
+            100% { opacity: 0.3; transform: translateY(0px); }
+        }
+
+        .telemetry-dot {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes settleIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-settle {
+            animation: settleIn 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#85d5cd",
+                        "tertiary": "#cdbff0",
+                        "surface": "#111415",
+                        "on-surface": "#e1e3e4",
+                        "on-surface-variant": "#c7c6cc",
+                        "outline": "#909096",
+                        "background": "#111415",
+                        "surface-container": "#1d2021",
+                        "surface-container-high": "#282a2b"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "container-max": "1200px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Playfair Display", "serif"],
+                        "display": ["Playfair Display", "serif"],
+                        "body": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="selection:bg-secondary/30">
+<!-- TopAppBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/40 backdrop-blur-xl border-b border-white/5">
+<div class="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-6 max-w-[1200px] mx-auto">
+<div class="font-headline text-3xl font-semibold text-on-surface tracking-tight">Drift</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="font-mono text-xs uppercase tracking-widest text-on-surface-variant/70 hover:text-on-surface transition-colors" href="#">Home</a>
+<a class="font-mono text-xs uppercase tracking-widest text-secondary font-bold border-b border-secondary pb-1" href="#">Progress</a>
+<a class="font-mono text-xs uppercase tracking-widest text-on-surface-variant/70 hover:text-on-surface transition-colors" href="#">About</a>
+<a class="font-mono text-xs uppercase tracking-widest text-on-surface-variant/70 hover:text-on-surface transition-colors" href="#">Profile</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-secondary hover:opacity-80 transition-opacity" style="font-variation-settings: 'wght' 300">notifications</button>
+<button class="material-symbols-outlined text-secondary hover:opacity-80 transition-opacity" style="font-variation-settings: 'wght' 300">settings</button>
+</div>
+</div>
+</nav>
+<main class="pt-32 pb-24 px-margin-mobile md:px-margin-desktop max-w-[1200px] mx-auto min-h-screen">
+<!-- Header Section -->
+<header class="mb-16 animate-settle">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<span class="font-mono text-[10px] text-secondary tracking-[0.3em] uppercase mb-4 block">System Status: Synchronized</span>
+<h1 class="font-display text-5xl md:text-7xl text-on-surface mb-4">Your Progress</h1>
+<p class="font-body text-lg text-on-surface-variant max-w-xl leading-relaxed">
+                    A cinematic overview of your focus cycles and peak productivity moments from the last 24 hours.
+                </p>
+</div>
+<div class="flex gap-12 border-l border-white/10 pl-8">
+<div>
+<span class="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1">Attention Velocity</span>
+<span class="font-display text-3xl text-on-surface italic">8.42 <span class="text-sm font-sans not-italic text-secondary">µ/s</span></span>
+</div>
+<div>
+<span class="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1">Cognitive Load</span>
+<span class="font-display text-3xl text-on-surface italic">42<span class="text-sm font-sans not-italic text-secondary">%</span></span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Graph: Spectral Attention Mapping -->
+<section class="mb-12 animate-settle" style="animation-delay: 0.1s;">
+<div class="glass-card rounded-xl p-6 md:p-10 relative overflow-hidden">
+<!-- Technical Metadata Top -->
+<div class="flex justify-between items-start mb-12">
+<div class="space-y-1">
+<h3 class="font-mono text-[11px] text-secondary uppercase tracking-widest">Spectral Attention Mapping</h3>
+<p class="font-mono text-[9px] text-on-surface-variant opacity-50 uppercase tracking-tighter">Ref_ID: DRFT-SYS-v1.0.42 // Telemetry Active</p>
+</div>
+<div class="flex gap-4 items-center font-mono text-[10px] text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span>Deep Focus (θ)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span>Cognitive Flow (α)</span>
+</div>
+</div>
+</div>
+<!-- SVG Graph Container -->
+<div class="h-[400px] w-full relative">
+<!-- Grid Lines -->
+<div class="absolute inset-0 flex flex-col justify-between py-2 pointer-events-none">
+<div class="border-t border-white/5 w-full"></div>
+<div class="border-t border-white/5 w-full"></div>
+<div class="border-t border-white/5 w-full"></div>
+<div class="border-t border-white/5 w-full"></div>
+<div class="border-t border-white/5 w-full"></div>
+</div>
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 1000 400">
+<defs>
+<lineargradient id="tealGradient" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#85d5cd" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#85d5cd" stop-opacity="0"></stop>
+</lineargradient>
+<lineargradient id="lavenderGradient" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#cdbff0" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#cdbff0" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Area Chart 1 (Lavender - Flow) -->
+<path d="M0,400 Q100,350 200,320 T400,280 T600,340 T800,290 T1000,310 L1000,400 L0,400 Z" fill="url(#lavenderGradient)"></path>
+<path class="spectral-line" d="M0,310 Q100,350 200,320 T400,280 T600,340 T800,290 T1000,310" fill="none" stroke="#cdbff0" stroke-opacity="0.6" stroke-width="1.5"></path>
+<!-- Area Chart 2 (Teal - Deep Focus) -->
+<path d="M0,400 Q150,380 300,200 T450,150 T600,100 T750,250 T1000,300 L1000,400 L0,400 Z" fill="url(#tealGradient)"></path>
+<path class="spectral-line" d="M0,380 Q150,380 300,200 T450,150 T600,100 T750,250 T1000,300" fill="none" stroke="#85d5cd" stroke-width="2"></path>
+<!-- Annotations -->
+<g class="telemetry-dot">
+<circle cx="600" cy="100" fill="#85d5cd" r="4"></circle>
+<line stroke="#85d5cd" stroke-width="0.5" x1="600" x2="600" y1="100" y2="60"></line>
+<text fill="#85d5cd" font-family="JetBrains Mono" font-size="10" font-weight="500" x="610" y="55">THETA WAVE ALIGNMENT [PEAK]</text>
+</g>
+<g class="opacity-40">
+<line stroke="#cdbff0" stroke-dasharray="2,2" stroke-width="0.5" x1="300" x2="300" y1="200" y2="160"></line>
+<text fill="#cdbff0" font-family="JetBrains Mono" font-size="9" x="310" y="155">FLOW_SYNCHRONIZED</text>
+</g>
+</svg>
+</div>
+<!-- X-Axis Labels -->
+<div class="flex justify-between mt-8 px-2 font-mono text-[10px] text-on-surface-variant uppercase tracking-widest opacity-40">
+<span>00:00</span>
+<span>04:00</span>
+<span>08:00</span>
+<span>12:00</span>
+<span>16:00</span>
+<span>20:00</span>
+<span>23:59</span>
+</div>
+</div>
+</section>
+<!-- Stats Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-gutter animate-settle" style="animation-delay: 0.2s;">
+<!-- Card 1 -->
+<div class="glass-card rounded-xl p-8 border-l-2 border-l-secondary">
+<span class="font-mono text-[9px] text-secondary tracking-widest uppercase block mb-6">Metric_Total</span>
+<div class="flex items-end gap-3 mb-2">
+<span class="font-display text-4xl text-on-surface italic">4h 42m</span>
+<span class="material-symbols-outlined text-secondary pb-1" style="font-variation-settings: 'wght' 200">timer</span>
+</div>
+<p class="font-body text-xs text-on-surface-variant leading-relaxed">Cumulative focus duration within the current 24h cycle.</p>
+</div>
+<!-- Card 2 -->
+<div class="glass-card rounded-xl p-8 border-l-2 border-l-tertiary">
+<span class="font-mono text-[9px] text-tertiary tracking-widest uppercase block mb-6">Optimal_Window</span>
+<div class="flex items-end gap-3 mb-2">
+<span class="font-display text-4xl text-on-surface italic">10:00 AM</span>
+<span class="material-symbols-outlined text-tertiary pb-1" style="font-variation-settings: 'wght' 200">auto_awesome</span>
+</div>
+<p class="font-body text-xs text-on-surface-variant leading-relaxed">Your neural state showed maximum coherence at this timestamp.</p>
+</div>
+<!-- Card 3 -->
+<div class="glass-card rounded-xl p-8 border-l-2 border-l-white/10">
+<span class="font-mono text-[9px] text-on-surface-variant tracking-widest uppercase block mb-6">Sync_Index</span>
+<div class="flex items-end gap-3 mb-2">
+<span class="font-display text-4xl text-on-surface italic">89.4%</span>
+<span class="material-symbols-outlined text-on-surface-variant/40 pb-1" style="font-variation-settings: 'wght' 200">hub</span>
+</div>
+<p class="font-body text-xs text-on-surface-variant leading-relaxed">Weekly average alignment remains within high-performance margins.</p>
+</div>
+</section>
+<!-- Contextual Insight (Editorial Style) -->
+<section class="mt-gutter animate-settle" style="animation-delay: 0.3s;">
+<div class="glass-card rounded-xl p-10 relative overflow-hidden group">
+<div class="max-w-3xl relative z-10">
+<div class="flex items-center gap-3 mb-6">
+<div class="h-[1px] w-8 bg-secondary"></div>
+<span class="font-mono text-[10px] text-secondary tracking-[0.2em] uppercase">Deep Work Synthesis Report</span>
+</div>
+<h3 class="font-display text-3xl md:text-4xl text-on-surface italic mb-6">“Your focus was 24% higher during the morning hours today compared to your weekly average.”</h3>
+<p class="font-body text-lg text-on-surface-variant/80 leading-relaxed mb-8">
+                    Data analysis suggests a significant correlation between your early-morning environmental settings and sustained theta-wave activity. Capitalize on this peak by scheduling high-entropy tasks—architectural design or deep coding—prior to the midday cognitive shift.
+                </p>
+<div class="flex gap-8 border-t border-white/5 pt-8">
+<div class="flex flex-col">
+<span class="font-mono text-[9px] text-on-surface-variant/40 uppercase mb-1">Confidence Score</span>
+<span class="font-mono text-sm text-secondary">0.982</span>
+</div>
+<div class="flex flex-col">
+<span class="font-mono text-[9px] text-on-surface-variant/40 uppercase mb-1">Impact Radius</span>
+<span class="font-mono text-sm text-on-surface">Significant</span>
+</div>
+</div>
+</div>
+<div class="absolute -right-20 -bottom-20 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity duration-700">
+<span class="material-symbols-outlined text-[300px]" style="font-variation-settings: 'wght' 100">psychology_alt</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-16 border-t border-white/5">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop max-w-[1200px] mx-auto gap-gutter">
+<div class="font-display text-2xl text-on-surface italic">Drift Wellness</div>
+<div class="font-mono text-[10px] text-on-surface-variant/50 uppercase tracking-widest">© 2024 Drift Analytics. Neural telemetry encrypted.</div>
+<div class="flex gap-8">
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-mono text-[10px] uppercase tracking-widest" href="#">Privacy</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-mono text-[10px] uppercase tracking-widest" href="#">Legal</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-mono text-[10px] uppercase tracking-widest" href="#">Support</a>
+</div>
+</div>
+</footer>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initializing view states
+        const spectralLines = document.querySelectorAll('.spectral-line');
+        spectralLines.forEach((line, index) => {
+            line.style.animationDelay = `${index * 0.4}s`;
+        });
+    });
+</script>
+</body></html>

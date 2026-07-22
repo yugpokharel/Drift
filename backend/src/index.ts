@@ -114,7 +114,7 @@ app.post('/api/recommendations', async (req, res) => {
     const lastfmResult = liveMusic.status === 'fulfilled' ? liveMusic.value : null;
     const hybrid = hybridResult.status === 'fulfilled' ? hybridResult.value : null;
 
-    // Movie: hybrid (ALS + mood) > TMDB > seed fallback
+    // Primary TV Show: hybrid (ALS + mood) recommendation
     let movie: any;
     if (hybrid) {
       movie = {
@@ -125,16 +125,18 @@ app.post('/api/recommendations', async (req, res) => {
         imdbRating: hybrid.imdbRating,
         rottenTomatoes: hybrid.rottenTomatoes,
         whyThisPick: hybrid.whyThisPick,
+        type: 'tv_show',
       };
-    } else if (tmdbResult?.movie) {
-      movie = { ...seedFallback.movie, title: tmdbResult.movie.title, extraInfo: tmdbResult.movie.extraInfo };
+    } else if (tmdbResult?.tv_show) {
+      movie = { ...seedFallback.movie, title: tmdbResult.tv_show.title, extraInfo: tmdbResult.tv_show.extraInfo, type: 'tv_show' };
     } else {
-      movie = seedFallback.movie;
+      movie = { ...seedFallback.movie, type: 'tv_show' };
     }
 
-    const tv_show = (tmdbResult?.tv_show)
-      ? { ...seedFallback.tv_show, title: tmdbResult.tv_show.title, extraInfo: tmdbResult.tv_show.extraInfo }
-      : seedFallback.tv_show;
+    // Secondary TV Show: from TMDB trending TV
+    const tv_show = tmdbResult?.tv_show
+      ? { ...seedFallback.tv_show, title: tmdbResult.tv_show.title, extraInfo: tmdbResult.tv_show.extraInfo, type: 'tv_show' }
+      : { ...seedFallback.tv_show, type: 'tv_show' };
 
     const music = lastfmResult
       ? { ...seedFallback.music, title: lastfmResult.title, extraInfo: lastfmResult.extraInfo }
@@ -147,6 +149,7 @@ app.post('/api/recommendations', async (req, res) => {
 
   }
 });
+
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -190,15 +193,9 @@ app.post('/api/recommend', async (req, res) => {
 });
 
 
-// Connect to MongoDB then start server
-(async () => {
-  try {
-    await connectDB();
-    app.listen(PORT, () => {
-      console.log(`Drift Backend listening on port ${PORT}`);
-    });
-  } catch (err: any) {
-    console.error('[Startup] Failed to connect to MongoDB:', err.message);
-    process.exit(1);
-  }
-})();
+// Start Express listener immediately, then attempt DB connection in background
+app.listen(PORT, () => {
+  console.log(`Drift Backend listening on port ${PORT}`);
+  connectDB().catch(err => console.error('[DB] Background connection failed:', err.message));
+});
+

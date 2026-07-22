@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Drift - Your Wellness Journey</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-tint": "#c3c6d7",
+                    "tertiary": "#cdbff0",
+                    "surface-container": "#1d2021",
+                    "tertiary-fixed": "#e8ddff",
+                    "secondary": "#85d5cd",
+                    "primary-fixed": "#dfe2f3",
+                    "primary": "#c3c6d7",
+                    "on-surface-variant": "#c7c6cc",
+                    "surface": "#111415",
+                    "surface-container-high": "#282a2b",
+                    "surface-container-highest": "#323536",
+                    "on-background": "#e1e3e4",
+                    "outline": "#909096",
+                    "on-secondary-fixed": "#00201e",
+                    "on-primary": "#2c303d",
+                    "secondary-fixed-dim": "#85d5cd",
+                    "error-container": "#93000a",
+                    "on-tertiary": "#342a51",
+                    "on-secondary-container": "#93e3db",
+                    "on-primary-fixed-variant": "#434654",
+                    "on-primary-container": "#777b8a",
+                    "tertiary-fixed-dim": "#cdbff0",
+                    "surface-container-lowest": "#0c0f10",
+                    "surface-variant": "#323536",
+                    "secondary-fixed": "#a0f1e9",
+                    "outline-variant": "#46464c",
+                    "surface-bright": "#373a3b",
+                    "secondary-container": "#006761",
+                    "inverse-surface": "#e1e3e4",
+                    "on-primary-fixed": "#171b28",
+                    "tertiary-container": "#11062d",
+                    "surface-container-low": "#191c1d",
+                    "on-tertiary-fixed-variant": "#4b4169",
+                    "on-surface": "#e1e3e4",
+                    "inverse-on-surface": "#2e3132",
+                    "inverse-primary": "#5a5e6d",
+                    "on-tertiary-fixed": "#1f153b",
+                    "background": "#111415",
+                    "on-error": "#690005",
+                    "primary-fixed-dim": "#c3c6d7",
+                    "on-secondary-fixed-variant": "#00504b",
+                    "on-secondary": "#003734",
+                    "primary-container": "#0a0e1a",
+                    "surface-dim": "#111415",
+                    "on-error-container": "#ffdad6",
+                    "on-tertiary-container": "#8075a1",
+                    "error": "#ffb4ab"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "8px",
+                    "margin-mobile": "20px",
+                    "container-max": "1200px",
+                    "margin-desktop": "64px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "label-caps": ["Inter"],
+                    "display-lg": ["Playfair Display"],
+                    "headline-sm": ["Playfair Display"],
+                    "headline-md": ["Playfair Display"],
+                    "display-lg-mobile": ["Playfair Display"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                    "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "display-lg-mobile": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #111415;
+            color: #e1e3e4;
+            scroll-behavior: smooth;
+        }
+        .glass-card {
+            background: rgba(29, 32, 33, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: scale(1.01);
+            box-shadow: 0 0 40px rgba(133, 213, 205, 0.05);
+        }
+        .aura-glow {
+            filter: blur(80px);
+            opacity: 0.15;
+            pointer-events: none;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        @keyframes flow {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.02); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        .animate-flow {
+            animation: flow 8s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md overflow-x-hidden">
+<!-- Top Navigation -->
+<nav class="fixed top-0 w-full z-50 bg-surface/40 backdrop-blur-xl border-b border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
+<div class="flex justify-between items-center px-margin-desktop h-20 max-w-container-max mx-auto">
+<span class="font-display-lg text-headline-md tracking-tighter text-primary">Drift</span>
+<div class="hidden md:flex items-center gap-8 font-body-md text-body-md tracking-tight">
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Home</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Progress</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">About</a>
+<a class="text-secondary border-b-2 border-secondary pb-1" href="#">Profile</a>
+</div>
+<div class="flex items-center gap-6">
+<button class="material-symbols-outlined text-primary hover:bg-white/5 p-2 rounded-full transition-all active:scale-95">notifications</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" data-alt="A sophisticated close-up portrait of a calm person with soft, ethereal lighting. The aesthetic is cinematic and high-contrast, featuring deep indigo and teal shadows with warm highlights, perfectly matching a dark-mode wellness app's professional profile aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChWc-mDv3L_r8z9_4pLDo-A2a9FWVoCmXkjZw0Wo5TIBOjg7gm0VScohBS5_niG7zj8V5EAOgwmn6hFeSxqIMS_q33LGxUSh8pxMh5oPyt1kiIKwPv8qhTnGJKlOHYnkGBP_YGg_xrPz1MpBuU4xdswNKUvGDvKBiF7XBbKkPlcEYPE1tITspg6e-vaPZM2VB02WtrD1-_2oe0ECO_U0xn-kIbq-IGPndooOGjYZo4eZv3SG1ZukMf_UmV4HSd02PTw7yubR-J5B7T"/>
+</div>
+</div>
+</div>
+</nav>
+<main class="pt-32 pb-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto relative">
+<!-- Background Aura -->
+<div class="absolute top-0 right-0 w-96 h-96 bg-secondary aura-glow"></div>
+<div class="absolute bottom-1/2 left-0 w-80 h-80 bg-tertiary aura-glow"></div>
+<!-- Header Section -->
+<header class="mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
+<div class="max-w-2xl">
+<h1 class="font-display-lg text-display-lg-mobile md:text-display-lg mb-4 text-on-background">Your Wellness Journey</h1>
+<p class="text-on-surface-variant text-body-lg max-w-lg">A quiet reflection of your digital presence and mental space over the last month.</p>
+</div>
+<button class="flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-secondary to-tertiary text-on-secondary-fixed font-semibold tracking-wide hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-secondary/20">
+<span class="material-symbols-outlined">tune</span>
+                Recalibrate
+            </button>
+</header>
+<!-- Attention Visualization Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-24">
+<!-- Main Trend Visualization -->
+<div class="md:col-span-8 glass-card rounded-3xl p-8 relative overflow-hidden h-[450px] flex flex-col justify-between">
+<div class="relative z-10">
+<h3 class="font-label-caps text-label-caps text-secondary mb-2">ATTENTION TRENDS</h3>
+<p class="text-on-surface text-headline-sm">Mental Clarity Index</p>
+</div>
+<!-- Abstract Waves Visualization Placeholder -->
+<div class="absolute inset-0 flex items-end justify-around pb-12 px-12 gap-1 pointer-events-none">
+<!-- Dynamic Wave Pillars -->
+<div class="w-full h-1/2 bg-gradient-to-t from-secondary/40 to-transparent rounded-t-full animate-flow" style="animation-delay: 0s;"></div>
+<div class="w-full h-3/4 bg-gradient-to-t from-tertiary/40 to-transparent rounded-t-full animate-flow" style="animation-delay: 1.2s;"></div>
+<div class="w-full h-2/3 bg-gradient-to-t from-secondary/40 to-transparent rounded-t-full animate-flow" style="animation-delay: 0.5s;"></div>
+<div class="w-full h-5/6 bg-gradient-to-t from-primary/30 to-transparent rounded-t-full animate-flow" style="animation-delay: 2.1s;"></div>
+<div class="w-full h-1/2 bg-gradient-to-t from-tertiary/40 to-transparent rounded-t-full animate-flow" style="animation-delay: 1.5s;"></div>
+<div class="w-full h-2/3 bg-gradient-to-t from-secondary/40 to-transparent rounded-t-full animate-flow" style="animation-delay: 0.8s;"></div>
+</div>
+<div class="relative z-10 flex justify-between items-end">
+<div class="text-on-surface-variant font-label-caps text-[10px]">MAY 1</div>
+<div class="px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-body-md text-on-surface italic">
+                        Most focused at <span class="text-secondary font-bold">10:00 AM</span>
+</div>
+<div class="text-on-surface-variant font-label-caps text-[10px]">MAY 30</div>
+</div>
+</div>
+<!-- Stats Card (De-emphasized) -->
+<div class="md:col-span-4 flex flex-col gap-gutter">
+<div class="glass-card rounded-3xl p-8 flex-1 flex flex-col justify-center">
+<span class="material-symbols-outlined text-secondary mb-4 text-3xl">hourglass_empty</span>
+<h4 class="font-label-caps text-label-caps text-on-surface-variant mb-1">TOTAL FOCUS HOURS</h4>
+<p class="font-display-lg text-headline-md text-primary">124.5</p>
+</div>
+<div class="glass-card rounded-3xl p-8 flex-1 flex flex-col justify-center">
+<span class="material-symbols-outlined text-tertiary mb-4 text-3xl" style="font-variation-settings: 'FILL' 1;">spa</span>
+<h4 class="font-label-caps text-label-caps text-on-surface-variant mb-1">MOST COMMON STATE</h4>
+<p class="font-display-lg text-headline-md text-tertiary">Settled</p>
+</div>
+</div>
+</section>
+<!-- Recent Picks Section -->
+<section class="mb-24">
+<div class="flex items-center justify-between mb-8">
+<h2 class="font-headline-sm text-on-background">Recent Picks</h2>
+<a class="text-label-caps text-secondary hover:underline" href="#">VIEW HISTORY</a>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+<!-- Media Card 1 -->
+<div class="group cursor-pointer">
+<div class="aspect-[2/3] rounded-2xl overflow-hidden mb-4 relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A moody, atmospheric movie poster for a minimalist sci-fi film. Dark indigo sky with a single glowing teal circular light source. High cinematic grain, elegant typography, and a sense of deep solitude and peace. Matching the Drift dark-mode color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3WYgva6C0FlyM9VJ0RaSk2gK3BQrvPMdhDziMfDjsyB5VP1isUA841y3VDfqvdPN1ch9Gp7OcmpaPCd8CWnd8hpWfhCFDKAF3UIZXIOcunlI5UauGzsLe5Ts6PE-hfTMh5j5vRF3sxhj7JwWtHtNHik9m1-pUHDh0cfwaGA-z1aieLiyzI-BGIodHnEtNItgTvzKbaplnLJ1Pfmvue7lsqgeK3dixuf8v2vTUbZz3tmCqcHkUPPCh9Bm-cLeZ7cq-f6OML3k1G42X"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+<span class="material-symbols-outlined text-white">play_circle</span>
+</div>
+</div>
+<p class="text-on-surface font-semibold mb-1">The Silent Void</p>
+<p class="text-on-surface-variant text-label-caps">FILM • 2H 14M</p>
+</div>
+<!-- Media Card 2 -->
+<div class="group cursor-pointer">
+<div class="aspect-[2/3] rounded-2xl overflow-hidden mb-4 relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Minimalist abstract album cover art featuring soft-focus blurred lavender and navy gradients. A single crisp geometric line intersects the center. Sophisticated, calm, and evocative of ambient or lo-fi music styles. Designed for a high-end wellness application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJyaxlt7vCtTDnwIfmRvlnV87xyHiir7irRLfU2mgbC8tR0PQ6DRBsJZQLM1L80ihvW-dyfu0FPrq5Vdk4L-zwAvSuxWSuBhL2y4Z9giYcC2wTWU0N8FUx_mqtyIDyQGYdeIm-CRYSg6NMCznGRSO0RwminqzHw9ARoZpAOr-pITpAopI5yFJejf3ObCZOeZDea2gM1IEL3xi3mGi3SdndP4Prk6CJApqhYK2sHTrHuJKUHcmgOrYSvXy4-3LwVQJrM7jC1MGtKywj"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+<span class="material-symbols-outlined text-white">music_note</span>
+</div>
+</div>
+<p class="text-on-surface font-semibold mb-1">Evening Ebb</p>
+<p class="text-on-surface-variant text-label-caps">ALBUM • AMBIENT</p>
+</div>
+<!-- Media Card 3 -->
+<div class="group cursor-pointer">
+<div class="aspect-[2/3] rounded-2xl overflow-hidden mb-4 relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A striking cinematic photograph of a misty mountain range at dusk, monochromatic blue tones with a sliver of silver moon. Dramatic lighting, high contrast, feeling like a high-end editorial nature documentary poster. Minimalist and soulful." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyGETc5EQ3KBXO63eDf054jNFRYA6XwS-G0XnUAr-UcXIvw4zf1X4urA5Vja4L2mwefU7I65211W7cP6TYNReZlPyWCufTKmP7xOk2Syy8rrPQTFaOHgUvLGSGmYAgIPOFL3EZJQRHNu1G6nq2sQvusX9Usnvi18xKjax80LDZMVSxYqpuK2C9sCPaBr0YAZ4Uy84rN6GuX90scL-XUoG8J9Gz0nljZInT-eqphVkEqxrathB1bK76myjke-A5G7BN5GbyApfokShl"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+<span class="material-symbols-outlined text-white">play_circle</span>
+</div>
+</div>
+<p class="text-on-surface font-semibold mb-1">Tides of Time</p>
+<p class="text-on-surface-variant text-label-caps">DOCU • 45M</p>
+</div>
+<!-- Media Card 4 -->
+<div class="group cursor-pointer">
+<div class="aspect-[2/3] rounded-2xl overflow-hidden mb-4 relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Artistic book cover featuring a macro photograph of water ripples with deep indigo and metallic highlights. Abstract, fluid, and calm. High-quality editorial design style for a meditation or philosophy collection." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLTMN37ycGgnNpxgjvz2vHbw7NK5BxnhsbZuEjV7D6b2sLfWX0plncIIjnoQTSpGSdLjO7S910GxC5jIAVtUXhA1cjEmb9FR1d83bccoeSEdWFmJMK3jGngJhlW-GrIuyXKtX8aRkkSeYWC8tPoCyy0nRu9fjoJNtmzT1K50FvbMV2xHkwxIks5B087cdFPajRiYHUpxYaSN5qqFUtIJ1CR1UbLAtqu2xpyzqUkq3-YtXXfsXD5KJ4q-qvIc_L68cih4yxGGDRE-tk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+<span class="material-symbols-outlined text-white">menu_book</span>
+</div>
+</div>
+<p class="text-on-surface font-semibold mb-1">Focus Flow</p>
+<p class="text-on-surface-variant text-label-caps">GUIDE • 12M READ</p>
+</div>
+</div>
+</section>
+<!-- Insights Summary (Asymmetric Layout) -->
+<section class="mb-24 flex flex-col md:flex-row gap-16 items-center">
+<div class="w-full md:w-1/2">
+<div class="glass-card rounded-full p-1 w-fit mb-8">
+<div class="bg-primary text-on-primary px-6 py-2 rounded-full font-label-caps">MONTHLY INSIGHT</div>
+</div>
+<h2 class="font-display-lg text-headline-md md:text-headline-md mb-6 leading-tight">Your digital heart rate has stabilized.</h2>
+<p class="text-on-surface-variant text-body-lg mb-8">This month, you spent 14% less time on task-switching than in April. Your ability to enter 'Deep Flow' states increased significantly between 9 PM and 11 PM.</p>
+<div class="flex gap-4">
+<div class="flex items-center gap-2 text-secondary">
+<span class="material-symbols-outlined">check_circle</span>
+<span class="font-label-caps">REDUCED COGNITIVE LOAD</span>
+</div>
+<div class="flex items-center gap-2 text-tertiary">
+<span class="material-symbols-outlined">check_circle</span>
+<span class="font-label-caps">BETTER SLEEP PREP</span>
+</div>
+</div>
+</div>
+<div class="w-full md:w-1/2 glass-card rounded-[4rem] aspect-square overflow-hidden relative group">
+<img class="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-[3s]" data-alt="A highly detailed close-up of ink swirling in dark water, featuring deep blue, teal, and lavender hues. The motion is graceful and fluid, creating an abstract representation of a calm mind. 8k resolution, cinematic lighting, editorial style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_ru_oZkJGLp8HiLvg5Y_VCS9wnfwRKvux_9M46O3ckm1dwZClVHQdE7MTuJleqogRz-6_iEzUYrm-0qcoUjYq75rjMvHACXc3emFOvBFhteFe3CKGhrb5VpVkNoBF-gwPkukcziV_sKSjR-rWtNcNn_allupO8TSYzSqMlrGyItbVzmgNkJ2awvWuDhf5OHr5rsm3MES-IbtVYbhkqXvafmny6O4s55EoKdRcT8co3CvfbRe1IhpgtBnTMSHeAlJjzBYqlbvTVK5d"/>
+<div class="absolute inset-0 bg-surface/20"></div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest py-12 border-t border-white/5">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto space-y-4 md:space-y-0">
+<span class="font-display-lg text-headline-sm text-primary">Drift</span>
+<div class="flex gap-8 font-label-caps text-label-caps text-on-surface-variant">
+<a class="hover:text-secondary transition-opacity" href="#">Privacy Policy</a>
+<a class="hover:text-secondary transition-opacity" href="#">Terms of Service</a>
+<a class="hover:text-secondary transition-opacity" href="#">Cookie Settings</a>
+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">© 2024 Drift. All rights reserved.</p>
+</div>
+</footer>
+<script>
+        // Micro-interaction for the attention waves
+        document.addEventListener('mousemove', (e) => {
+            const waves = document.querySelectorAll('.animate-flow');
+            const x = (e.clientX / window.innerWidth - 0.5) * 10;
+            waves.forEach((wave, i) => {
+                wave.style.transform = `translateX(${x * (i + 1) * 0.2}px)`;
+            });
+        });
+    </script>
+</body></html>

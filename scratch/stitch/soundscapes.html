@@ -1,0 +1,273 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#cdbff0",
+                        "secondary-container": "#006761",
+                        "inverse-primary": "#5a5e6d",
+                        "on-secondary-fixed": "#00201e",
+                        "on-primary-fixed-variant": "#434654",
+                        "on-secondary": "#003734",
+                        "primary-fixed": "#dfe2f3",
+                        "on-tertiary-fixed": "#1f153b",
+                        "tertiary-container": "#11062d",
+                        "secondary": "#85d5cd",
+                        "on-secondary-fixed-variant": "#00504b",
+                        "background": "#111415",
+                        "surface-dim": "#111415",
+                        "secondary-fixed": "#a0f1e9",
+                        "outline": "#909096",
+                        "surface-tint": "#c3c6d7",
+                        "outline-variant": "#46464c",
+                        "surface-container-highest": "#323536",
+                        "surface-bright": "#373a3b",
+                        "on-primary": "#2c303d",
+                        "tertiary": "#cdbff0",
+                        "error-container": "#93000a",
+                        "primary-container": "#0a0e1a",
+                        "on-primary-fixed": "#171b28",
+                        "on-background": "#e1e3e4",
+                        "surface-container-high": "#282a2b",
+                        "primary-fixed-dim": "#c3c6d7",
+                        "secondary-fixed-dim": "#85d5cd",
+                        "on-tertiary-fixed-variant": "#4b4169",
+                        "on-error": "#690005",
+                        "tertiary-fixed": "#e8ddff",
+                        "on-surface": "#e1e3e4",
+                        "on-error-container": "#ffdad6",
+                        "surface": "#111415",
+                        "surface-container-low": "#191c1d",
+                        "primary": "#c3c6d7",
+                        "error": "#ffb4ab",
+                        "surface-container-lowest": "#0c0f10",
+                        "surface-container": "#1d2021",
+                        "on-tertiary": "#342a51",
+                        "on-surface-variant": "#c7c6cc",
+                        "inverse-surface": "#e1e3e4",
+                        "surface-variant": "#323536",
+                        "on-tertiary-container": "#8075a1",
+                        "on-secondary-container": "#93e3db",
+                        "on-primary-container": "#777b8a",
+                        "inverse-on-surface": "#2e3132"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "gutter": "24px",
+                        "container-max": "1200px",
+                        "unit": "8px",
+                        "margin-desktop": "64px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "headline-sm": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                        "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "display-lg-mobile": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                        "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0A0E1A; /* Brand deep indigo */
+            color: #e1e3e4;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(17, 20, 21, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .tile-selected {
+            box-shadow: 0 0 32px rgba(133, 213, 205, 0.15);
+            border-color: rgba(133, 213, 205, 0.4);
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            box-shadow: 0 0 8px rgba(133, 213, 205, 0.1);
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #cdbff0; /* Lavender/Tertiary */
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -8px;
+            box-shadow: 0 0 15px rgba(205, 191, 240, 0.6);
+        }
+        .weighted-transition {
+            transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased min-h-screen flex flex-col">
+<!-- TopNavBar Cluster -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-8 md:px-margin-desktop h-20 bg-background/80 backdrop-blur-xl border-b border-white/5">
+<div class="font-headline-md text-headline-md tracking-tighter text-secondary dark:text-secondary">Drift</div>
+<nav class="hidden md:flex items-center space-x-8">
+<a class="font-label-caps text-label-caps text-on-surface-variant/60 hover:text-on-surface transition-colors" href="#">Home</a>
+<a class="font-label-caps text-label-caps text-secondary border-b-2 border-secondary pb-1" href="#">Progress</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant/60 hover:text-on-surface transition-colors" href="#">About</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant/60 hover:text-on-surface transition-colors" href="#">Profile</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-white/5 transition-all duration-300">
+<span class="material-symbols-outlined text-secondary" data-icon="settings">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-32 pb-24 px-margin-mobile md:px-0">
+<div class="max-w-container-max mx-auto flex flex-col items-center">
+<!-- Hero Header Section -->
+<section class="text-center mb-16 max-w-2xl">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-6 text-on-background animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                    Choose your soundscape
+                </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant/80 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-150">
+                    A collection of cinematic environments designed to ground your focus and reduce digital noise.
+                </p>
+</section>
+<!-- Main Interactive Card -->
+<div class="w-full md:max-w-4xl glass-card rounded-[32px] p-8 md:p-12 mb-12 weighted-transition shadow-2xl relative overflow-hidden">
+<!-- Subtle background ambient glow -->
+<div class="absolute -top-24 -right-24 w-96 h-96 bg-secondary/5 blur-[120px] rounded-full pointer-events-none"></div>
+<div class="absolute -bottom-24 -left-24 w-96 h-96 bg-tertiary/5 blur-[120px] rounded-full pointer-events-none"></div>
+<div class="grid grid-cols-2 gap-4 md:gap-8 mb-12" id="soundscape-grid">
+<!-- Tile 1: Rain -->
+<button class="sound-tile group relative aspect-square md:aspect-video rounded-3xl overflow-hidden glass-card weighted-transition hover:scale-[1.02] hover:bg-white/5 flex flex-col items-center justify-center p-6 border-transparent border-2" data-sound="rain">
+<div class="w-24 h-24 md:w-32 md:h-32 mb-4 weighted-transition group-hover:scale-110">
+<img class="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(133,213,205,0.4)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyfDXcOBqvyx0HFhiyabEZLUh9jfP9-jvUb2JikcqgO-G3rft0V6X3p0aBM9F49sbyR_cTLfQrxNAgiaQXXaPNfWr1jJe8Or7Y0sSf33RTeVWp9Z4JMO7ePolhwmeM1FN97uHjlq7x1qaWKgrCs5hOPRPDDRUeuCy8_TZykaP2l6Qe3Qm4ypF61AHp1YRU7CDxIiulPHzYVC2QSkhmjYBs4qL9BM24eVYKzRiitx7jnEej2O7KKsFoCqqj1eNbmOlnT86tvMCKMTky">
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Rain</span>
+<div class="absolute inset-0 bg-secondary/10 opacity-0 group-[.selected]:opacity-100 transition-opacity duration-500"></div>
+</button>
+<!-- Tile 2: White Noise -->
+<button class="sound-tile group relative aspect-square md:aspect-video rounded-3xl overflow-hidden glass-card weighted-transition hover:scale-[1.02] hover:bg-white/5 flex flex-col items-center justify-center p-6 border-transparent border-2" data-sound="white-noise">
+<div class="w-24 h-24 md:w-32 md:h-32 mb-4 weighted-transition group-hover:scale-110">
+<img class="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(205,191,240,0.4)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4oBHdXcEVCdRMaN21aKjp6Sum4-ZI9QhLx7ZVhk_dZuqPn2E1bLMAFE1EPAkardybIxfDEn8ET39dRnuRg9xVgJgwOQT1Gaw_WmDP8Qhdx6_LO5eVF9NZAdMCHgnCdJyGn8-L-_-Ru7XzOBxPBLXUaWd0JnYW4sQDKdqI4HgbKhHLc6HzdRcUsZ9z-trI8QF4bPbH4R9TebtwaVwoDIoxWP6l1RiltxLqioeQRffsE9NFbn__I_ZqA0LULVIDEkH1q7biOOKeV7J9">
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">White Noise</span>
+<div class="absolute inset-0 bg-tertiary/10 opacity-0 group-[.selected]:opacity-100 transition-opacity duration-500"></div>
+</button>
+<!-- Tile 3: Waves -->
+<button class="sound-tile group relative aspect-square md:aspect-video rounded-3xl overflow-hidden glass-card weighted-transition hover:scale-[1.02] hover:bg-white/5 flex flex-col items-center justify-center p-6 border-transparent border-2 selected tile-selected" data-sound="waves">
+<div class="w-24 h-24 md:w-32 md:h-32 mb-4 weighted-transition group-hover:scale-110">
+<img class="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(133,213,205,0.4)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEGcaTeEkfz_SOarwygANtqihHrSAcQ9K1Xs-dhkWzbrbyiepOryB4yDXW-6B903v7yoT4IPxy8yBWRPXRcTCtqlQseBpQ3i5WF1-5-HZFFpFzdXMM07_bT-MCl6FM3o3NXnhS27Pi_6ttkDAzwn7igm4sTecyG481Ezwl8KhLPqAO4K4i-fGkwcsBcK6CCWF1KY92XGK97WjNbHBAlkXWmC3aIVUHvzoCdERMDJNksdTkAo2BKxyCZvN69Tc_c6mHk94OWzGyCu8q">
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Waves</span>
+<div class="absolute inset-0 bg-secondary/10 opacity-100 transition-opacity duration-500"></div>
+</button>
+<!-- Tile 4: Forest -->
+<button class="sound-tile group relative aspect-square md:aspect-video rounded-3xl overflow-hidden glass-card weighted-transition hover:scale-[1.02] hover:bg-white/5 flex flex-col items-center justify-center p-6 border-transparent border-2" data-sound="forest">
+<div class="w-24 h-24 md:w-32 md:h-32 mb-4 weighted-transition group-hover:scale-110">
+<img class="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(205,191,240,0.4)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCDinE_Vz0DYXVVQgMaAx35xk-5oTPIjk1Tc5buXoQI1wNqaKpFc8gxNLVndTAK7tZh7CDHkVV43_gHmyybrw-hDgOLNP_rTueXgNLIfaHW37OU-R9vQx8Q9iH9XKNAT1FiXJXwTHIvEgAkDdbjyVyzPZFc1J-uS_wDWJV9iEj8OLWtq6FcNp6YWRDStSAmKnge9nP8P6i60YgodQqQA0Xn9NZeeZAbn-kfSUWLdfukNBpM-sWNGGonf2ovDd7RLbFy3F20If2EZG_">
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Forest</span>
+<div class="absolute inset-0 bg-tertiary/10 opacity-0 group-[.selected]:opacity-100 transition-opacity duration-500"></div>
+</button>
+</div>
+<!-- Session Length Slider -->
+<div class="flex flex-col space-y-8">
+<div class="flex justify-between items-end">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Session duration</label>
+<span class="font-body-lg text-body-lg text-secondary" id="duration-display">25 minutes</span>
+</div>
+<div class="px-2">
+<input class="w-full" id="duration-slider" max="60" min="5" step="5" type="range" value="25">
+<div class="flex justify-between mt-4 text-[10px] font-label-caps text-on-surface-variant/40">
+<span>5 MIN</span>
+<span>60 MIN</span>
+</div>
+</div>
+</div>
+<!-- CTA -->
+<button class="mt-12 w-full h-16 rounded-full bg-gradient-to-r from-secondary to-tertiary text-on-primary-fixed font-label-caps text-label-caps tracking-widest hover:scale-[1.01] active:scale-95 weighted-transition shadow-xl hover:shadow-secondary/20">
+                    START SESSION
+                </button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-24 px-6 md:hidden bg-background/40 backdrop-blur-2xl rounded-t-xl shadow-[0_-8px_32px_rgba(133,213,205,0.1)]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant/50" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-label-caps text-label-caps mt-1">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary scale-110" href="#">
+<span class="material-symbols-outlined" data-icon="graphic_eq">graphic_eq</span>
+<span class="font-label-caps text-label-caps mt-1">Session</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/50" href="#">
+<span class="material-symbols-outlined" data-icon="subscriptions">subscriptions</span>
+<span class="font-label-caps text-label-caps mt-1">Library</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/50" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-caps text-label-caps mt-1">Profile</span>
+</a>
+</nav>
+<script>
+        // Soundscape Tile Selection Logic
+        const tiles = document.querySelectorAll('.sound-tile');
+        tiles.forEach(tile => {
+            tile.addEventListener('click', () => {
+                tiles.forEach(t => {
+                    t.classList.remove('selected', 'tile-selected');
+                    t.querySelector('.absolute').style.opacity = '0';
+                });
+                tile.classList.add('selected', 'tile-selected');
+                tile.querySelector('.absolute').style.opacity = '1';
+                
+                // Add micro-interaction click effect
+                tile.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    tile.style.transform = 'scale(1.02)';
+                }, 100);
+            });
+        });
+
+        // Duration Slider Update
+        const slider = document.getElementById('duration-slider');
+        const display = document.getElementById('duration-display');
+        slider.addEventListener('input', (e) => {
+            display.textContent = `${e.target.value} minutes`;
+        });
+    </script>
+</body></html>

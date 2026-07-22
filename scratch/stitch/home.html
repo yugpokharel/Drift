@@ -1,0 +1,211 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        "colors": {
+                            "primary": "#ffffff",
+                            "on-primary": "#000000",
+                            "secondary": "#a7ff83", // Technical metadata green accent
+                            "on-secondary": "#000000",
+                            "tertiary": "#d1d5db",
+                            "surface": "#0e141a",
+                            "surface-dim": "#0e141a",
+                            "surface-bright": "#333a40",
+                            "surface-container-lowest": "#080f14",
+                            "surface-container-low": "#161c22",
+                            "surface-container": "#1c232b",
+                            "surface-container-high": "#283038",
+                            "surface-container-highest": "#333a40",
+                            "on-surface": "#f8fafc",
+                            "on-surface-variant": "#94a3b8",
+                            "outline": "#475569",
+                            "outline-variant": "#1e293b",
+                            "background": "#0e141a"
+                        },
+                        "borderRadius": {
+                            "DEFAULT": "0px",
+                            "lg": "0px",
+                            "xl": "0px",
+                            "full": "9999px"
+                        },
+                        "spacing": {
+                            "container-max": "1200px",
+                            "margin-desktop": "64px",
+                            "unit": "8px",
+                            "gutter": "24px",
+                            "margin-mobile": "20px"
+                        },
+                        "fontFamily": {
+                            "body-md": ["Inter", "sans-serif"],
+                            "label-caps": ["Inter", "sans-serif"],
+                            "body-lg": ["Inter", "sans-serif"],
+                            "display-lg": ["Playfair Display", "serif"],
+                            "headline-md": ["Playfair Display", "serif"],
+                            "display-lg-mobile": ["Playfair Display", "serif"],
+                            "headline-sm": ["Playfair Display", "serif"]
+                        },
+                        "fontSize": {
+                            "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                            "label-caps": ["11px", {"lineHeight": "1.0", "letterSpacing": "0.15em", "fontWeight": "600"}],
+                            "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                            "display-lg": ["72px", {"lineHeight": "1.05", "letterSpacing": "-0.03em", "fontWeight": "600"}],
+                            "headline-md": ["36px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                            "display-lg-mobile": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                            "headline-sm": ["28px", {"lineHeight": "1.3", "fontWeight": "500"}]
+                        }
+                    },
+                },
+            }
+        } catch (_e) {}
+    </script>
+<style>
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 1px;
+            cursor: pointer;
+            background: #475569;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            height: 12px;
+            width: 1px;
+            background: #a7ff83;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -6px;
+        }
+        .archive-border {
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md selection:bg-secondary/30 bg-surface text-on-surface"><nav class="fixed top-0 left-0 w-full z-50 border-b border-outline-variant bg-surface/80 backdrop-blur-md px-margin-mobile md:px-margin-desktop py-6">
+    <div class="max-w-container-max mx-auto flex justify-between items-center"><a href="#" class="font-display-lg text-2xl tracking-tighter text-primary">DRIFT</a><div class="hidden md:flex flex-1 justify-center gap-8 font-label-caps text-label-caps tracking-widest uppercase"><a href="#" class="hover:text-secondary transition-colors">Home</a><a href="#" class="hover:text-secondary transition-colors">Progress</a><a href="#" class="hover:text-secondary transition-colors">About</a><a href="#" class="hover:text-secondary transition-colors">Profile</a></div><div class="flex items-center gap-6"><button class="hover:text-secondary transition-colors"><span class="material-symbols-outlined text-[20px]">search</span></button><button class="hover:text-secondary transition-colors"><span class="material-symbols-outlined text-[20px]">account_circle</span></button></div></div>
+</nav>
+<!-- Top Navigation -->
+
+<main class="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-margin-mobile md:px-margin-desktop pt-16 pb-32">
+<!-- Subtle Technical Background Elements -->
+<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: linear-gradient(#94a3b8 1px, transparent 1px), linear-gradient(90deg, #94a3b8 1px, transparent 1px); background-size: 100px 100px;"></div>
+<!-- Hero Section -->
+<section class="max-w-4xl w-full text-center mb-20">
+<span class="font-label-caps text-label-caps text-secondary mb-6 block tracking-[0.3em]">DAILY ARCHIVE // SESSION_INIT</span>
+<h1 class="font-display-lg text-display-lg-mobile md:text-display-lg mb-8 text-primary">
+            How was your day?
+        </h1>
+<p class="font-headline-sm text-headline-sm italic text-on-surface-variant max-w-2xl mx-auto border-l border-secondary/30 pl-8 py-2">
+            “Choice is the thief of time. Less choosing, more living.”
+        </p>
+</section>
+<!-- Input Container Card -->
+<section class="w-full max-w-2xl archive-border bg-surface-container-low p-8 md:p-16 relative" id="input-card" style="transform: translate(1.41562px, 1.76016px);">
+<!-- Technical Corner Accents -->
+<div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-secondary"></div>
+<div class="absolute top-0 right-0 w-4 h-4 border-t border-r border-secondary"></div>
+<div class="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-secondary"></div>
+<div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-secondary"></div>
+<div class="space-y-16">
+<!-- Text Input -->
+<div class="relative">
+<label class="font-label-caps text-[10px] text-on-surface-variant uppercase mb-4 block">ENTRY_LOG_01</label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant pb-4 text-headline-sm font-body-md placeholder:text-outline focus:ring-0 focus:border-secondary transition-all outline-none text-on-surface" id="journal-input" placeholder="Type a few words, or skip this" type="text">
+</div>
+<!-- Slider Section -->
+<div class="space-y-10 flex flex-col items-center">
+<div class="flex justify-between w-full items-end">
+<label class="font-label-caps text-label-caps uppercase text-on-surface-variant">ATTENTION_SPAN_METRIC</label>
+<span class="font-label-caps text-secondary text-[10px]" id="slider-value">VALUE: 50%</span>
+</div>
+<div class="w-full relative py-2">
+<div class="absolute left-1/2 -top-12 -translate-x-1/2 w-16 h-16 flex items-center justify-center transition-all opacity-80" id="emoji-container">
+
+</div>
+<input class="cursor-crosshair" id="attention-slider" max="100" min="1" type="range" value="50">
+<div class="flex justify-between mt-6 font-label-caps text-[9px] text-outline px-0">
+<span class="tracking-widest">MIN // MOMENTARY</span>
+<span class="tracking-widest">MAX // IMMERSIVE</span>
+</div>
+</div>
+</div>
+<!-- Context Chips -->
+<div class="space-y-6">
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest text-center">ENVIRONMENT_CONTEXT</p>
+<div class="flex flex-wrap justify-center gap-2">
+<button class="chip px-6 py-3 border border-outline-variant bg-surface-container font-label-caps text-label-caps text-on-surface-variant hover:border-secondary hover:text-secondary transition-all active:scale-95" data-selected="false">ALONE</button>
+<button class="chip px-6 py-3 border border-outline-variant bg-surface-container font-label-caps text-label-caps text-on-surface-variant hover:border-secondary hover:text-secondary transition-all active:scale-95" data-selected="false">WITH OTHERS</button>
+<button class="chip px-6 py-3 border border-outline-variant bg-surface-container font-label-caps text-label-caps text-on-surface-variant hover:border-secondary hover:text-secondary transition-all active:scale-95" data-selected="false">BACKGROUND WATCH</button>
+<button class="chip px-6 py-3 border border-outline-variant bg-surface-container font-label-caps text-label-caps text-on-surface-variant hover:border-secondary hover:text-secondary transition-all active:scale-95" data-selected="false">FULLY FOCUSED</button>
+</div>
+</div>
+<!-- Primary CTA -->
+<button class="w-full py-6 bg-secondary text-on-secondary font-label-caps text-label-caps font-bold tracking-[0.2em] uppercase hover:bg-white transition-all active:scale-[0.98] border border-secondary">
+                EXECUTE_SEARCH
+            </button>
+</div>
+</section>
+<!-- Aesthetic Footer Elements -->
+<div class="mt-32 w-full max-w-container-max flex flex-col md:flex-row justify-between items-center opacity-50 px-margin-desktop space-y-6 md:space-y-0 text-on-surface-variant border-t border-outline-variant pt-12">
+<span class="font-label-caps text-[10px] tracking-widest">© 2024 DRIFT_EDITORIAL / ARCHIVE_SYSTEM</span>
+<div class="flex gap-10 font-label-caps text-[10px] tracking-widest uppercase">
+<a class="hover:text-secondary transition-colors" href="#">Privacy</a>
+<a class="hover:text-secondary transition-colors" href="#">Terms</a>
+<a class="hover:text-secondary transition-colors" href="#">Support</a>
+</div>
+</div>
+</main>
+<script>
+    const journalInput = document.getElementById('journal-input');
+    const attentionSlider = document.getElementById('attention-slider');
+    const mainNav = document.getElementById('main-nav');
+    const emojiContainer = document.getElementById('emoji-container');
+    const chips = document.querySelectorAll('.chip');
+    const sliderValueDisplay = document.getElementById('slider-value');
+
+    // Slider Micro-interactions
+    attentionSlider.addEventListener('input', () => {
+        const val = attentionSlider.value;
+        sliderValueDisplay.textContent = `VALUE: ${val}%`;
+        
+        emojiContainer.style.transform = `scale(${0.8 + (val/200)})`;
+        emojiContainer.style.opacity = 0.5 + (val/200);
+    });
+
+    // Chip Logic (Single Select)
+    chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            chips.forEach(c => {
+                c.classList.remove('bg-secondary', 'text-on-secondary', 'border-secondary');
+                c.classList.add('bg-surface-container', 'text-on-surface-variant', 'border-outline-variant');
+            });
+            chip.classList.add('bg-secondary', 'text-on-secondary', 'border-secondary');
+            chip.classList.remove('bg-surface-container', 'text-on-surface-variant', 'border-outline-variant');
+        });
+    });
+
+    // Subtle Background Motion
+    document.addEventListener('mousemove', (e) => {
+        const x = (e.clientX / window.innerWidth - 0.5) * 20;
+        const y = (e.clientY / window.innerHeight - 0.5) * 20;
+        const card = document.getElementById('input-card');
+        if (card) {
+            card.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+        }
+    });
+</script>
+
+
+
+
+</body></html>

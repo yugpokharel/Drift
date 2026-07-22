@@ -29,3 +29,13 @@ pnpm-debug.log*
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# ML training data (large raw datasets — not needed to run the app)
+# Training is pre-done; artifacts are in backend/src/data/
+backend/ml-32m/
+
+# Python virtual environment
+backend/venv/
+
+# Large model binary files (if ever regenerated locally)
+backend/src/data/*.npy

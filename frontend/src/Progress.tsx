@@ -87,23 +87,23 @@ function sameCalendarDay(a: Date, b: Date): boolean {
          a.getDate() === b.getDate();
 }
 
-function bucketBadgeStyle(bucket: string): React.CSSProperties {
+function bucketBadgeStyleClass(bucket: string): string {
   switch (bucket) {
     case 'brain-fried':
-      return { background: 'rgba(224,102,122,0.1)', border: '1px solid rgba(224,102,122,0.25)', color: '#E0667A' };
+      return 'bg-red-500/10 border border-red-500/20 text-red-400';
     case 'relaxed':
-      return { background: 'rgba(124,79,224,0.1)', border: '1px solid rgba(124,79,224,0.25)', color: '#A89FD4' };
+      return 'bg-indigo-500/10 border border-indigo-500/20 text-tertiary';
     case 'hyper-focused':
-      return { background: 'rgba(156,255,107,0.1)', border: '1px solid rgba(156,255,107,0.25)', color: '#9CFF6B' };
+      return 'bg-secondary/10 border border-secondary/20 text-secondary';
     default:
-      return { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#8FA67A' };
+      return 'bg-white/5 border border-white/10 text-on-surface-variant';
   }
 }
 
 function stressBarColor(stress: number): string {
-  if (stress < 35) return '#9CFF6B';
-  if (stress <= 65) return '#E8A65C';
-  return '#E0667A';
+  if (stress < 35) return '#a7ff83'; // secondary Neon Green
+  if (stress <= 65) return '#fbbf24'; // Amber
+  return '#ffb4ab'; // Error/Red
 }
 
 export default function Progress({ onNavigateHome }: Props) {
@@ -159,66 +159,66 @@ export default function Progress({ onNavigateHome }: Props) {
       {
         label: 'Stress',
         data: chartSessions.map(s => s.stress),
-        borderColor: '#F87171',
+        borderColor: '#ffb4ab',
         backgroundColor: 'transparent',
         tension: 0.4,
-        pointRadius: 3,
-        pointBackgroundColor: '#F87171',
+        pointRadius: 4,
+        pointBackgroundColor: '#ffb4ab',
       },
       {
         label: 'Calm',
         data: chartSessions.map(s => s.calm),
-        borderColor: '#8B5CF6',
+        borderColor: '#cdbff0',
         backgroundColor: 'transparent',
         tension: 0.4,
-        pointRadius: 3,
-        pointBackgroundColor: '#8B5CF6',
+        pointRadius: 4,
+        pointBackgroundColor: '#cdbff0',
       },
       {
         label: 'Attention',
         data: chartSessions.map(s => s.attention),
-        borderColor: '#6FFF2E',
+        borderColor: '#a7ff83',
         backgroundColor: 'transparent',
         tension: 0.4,
-        pointRadius: 3,
-        pointBackgroundColor: '#6FFF2E',
+        pointRadius: 4,
+        pointBackgroundColor: '#a7ff83',
       },
     ],
   };
 
   const chartOptions = {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
     animation: { duration: 600 },
     plugins: {
       legend: {
         position: 'top' as const,
         labels: {
-          color: '#A3B894',
-          font: { family: 'Space Grotesk', size: 12 },
-          boxWidth: 12,
-          padding: 20,
+          color: '#94a3b8',
+          font: { family: 'Inter', size: 12 },
+          boxWidth: 10,
+          padding: 15,
         },
       },
       tooltip: {
-        backgroundColor: 'rgba(8,10,5,0.9)',
-        borderColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: '#161c22',
+        borderColor: 'rgba(255,255,255,0.05)',
         borderWidth: 1,
-        titleColor: '#F0F7E8',
-        bodyColor: '#A3B894',
+        titleColor: '#f8fafc',
+        bodyColor: '#94a3b8',
         padding: 10,
       },
     },
     scales: {
       x: {
-        grid: { color: 'rgba(255,255,255,0.06)' },
-        ticks: { color: '#A3B894', font: { family: 'Space Grotesk', size: 12 } },
+        grid: { color: 'rgba(255,255,255,0.03)' },
+        ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11 } },
       },
       y: {
         min: 0,
         max: 100,
-        grid: { color: 'rgba(255,255,255,0.06)' },
-        ticks: { color: '#A3B894', font: { family: 'Space Grotesk', size: 12 } },
+        grid: { color: 'rgba(255,255,255,0.03)' },
+        ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11 } },
       },
     },
   };
@@ -229,29 +229,36 @@ export default function Progress({ onNavigateHome }: Props) {
   const today = new Date();
 
   return (
-    <div className="progress-page">
-      {/* Page header */}
-      <div className="progress-header">
-        <p className="progress-eyebrow">your data</p>
-        <h1 className="progress-headline">how you've been doing</h1>
-        <p className="progress-subline">every check-in you've done, visualised</p>
-      </div>
+    <div className="w-full max-w-container-max mx-auto py-12 px-6 md:px-margin-desktop fade-in z-10 relative">
+      {/* Page Header */}
+      <header className="mb-12">
+        <span className="font-meta-technical text-[11px] text-secondary uppercase tracking-[0.2em] mb-2 block">ANALYTICS // WORKSPACE</span>
+        <h1 className="font-display-lg text-display-lg-mobile md:text-display-lg text-primary leading-none mb-3">Your Wellness Journey</h1>
+        <p className="text-on-surface-variant text-body-lg max-w-lg">A quiet reflection of your digital presence and mental space over your logged history.</p>
+      </header>
 
       {/* Loading */}
       {loading && (
-        <div className="progress-loading">
-          <span className="progress-loading-text">loading your data</span>
+        <div className="flex justify-center items-center py-24">
+          <div className="breathing-circle w-12 h-12 bg-secondary/20 rounded-full border border-secondary/40 flex items-center justify-center">
+            <span className="w-4 h-4 bg-secondary rounded-full"></span>
+          </div>
+          <span className="ml-4 font-meta-technical text-meta-technical text-outline uppercase tracking-wider">Retrieving Logs...</span>
         </div>
       )}
 
-      {/* Empty state */}
+      {/* Empty State */}
       {!loading && sessions.length === 0 && (
-        <div className="progress-empty-wrap">
-          <div className="progress-empty-card">
-            <p className="progress-empty-title">nothing here yet</p>
-            <p className="progress-empty-sub">complete a check-in and your data will appear here</p>
-            <button className="progress-empty-btn" onClick={onNavigateHome}>
-              do a check-in
+        <div className="w-full max-w-md mx-auto py-16 text-center animate-settle">
+          <div className="glass-card rounded-[32px] p-12 border border-outline-variant flex flex-col items-center">
+            <span className="material-symbols-outlined text-4xl text-outline mb-6">hourglass_empty</span>
+            <p className="font-headline-sm text-headline-sm text-on-surface mb-2">No archive entries found</p>
+            <p className="text-on-surface-variant text-body-md mb-8">Complete a daily check-in to start logging your cognitive state.</p>
+            <button 
+              className="px-8 py-4 bg-secondary text-on-secondary font-meta-technical text-[12px] uppercase tracking-wider hover:bg-white transition-all duration-300 border border-secondary"
+              onClick={onNavigateHome}
+            >
+              Log Session Init
             </button>
           </div>
         </div>
@@ -259,109 +266,169 @@ export default function Progress({ onNavigateHome }: Props) {
 
       {/* Content — only shown when sessions exist */}
       {!loading && sessions.length > 0 && (
-        <>
-          {/* ── Section 1: Stats row ── */}
-          <div className="progress-stats-grid">
-            <div className="stat-card">
-              <p className="stat-label">total check-ins</p>
-              <p className="stat-value">{totalCheckins}</p>
+        <div className="space-y-16">
+          
+          {/* Section 1: Stats Grid */}
+          <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="glass-card rounded-3xl p-8 flex flex-col justify-between min-h-[160px]">
+              <div>
+                <span className="material-symbols-outlined text-secondary text-2xl mb-4">analytics</span>
+                <h4 className="font-meta-technical text-[10px] text-outline uppercase tracking-widest">TOTAL CHECK-INS</h4>
+              </div>
+              <p className="font-display-lg text-headline-md text-primary mt-2">{totalCheckins}</p>
             </div>
-            <div className="stat-card">
-              <p className="stat-label">avg stress</p>
-              <p className="stat-value">{avgStress}</p>
-              <p className="stat-sub">out of 100</p>
+            
+            <div className="glass-card rounded-3xl p-8 flex flex-col justify-between min-h-[160px]">
+              <div>
+                <span className="material-symbols-outlined text-error text-2xl mb-4">bolt</span>
+                <h4 className="font-meta-technical text-[10px] text-outline uppercase tracking-widest">AVERAGE STRESS</h4>
+              </div>
+              <div>
+                <p className="font-display-lg text-headline-md text-primary mt-2">{avgStress}</p>
+                <span className="font-meta-technical text-[9px] text-outline">OUT OF 100</span>
+              </div>
             </div>
-            <div className="stat-card">
-              <p className="stat-label">best day</p>
-              <p className="stat-value" style={{ fontSize: '22px' }}>{bestDay}</p>
-              <p className="stat-sub">lowest stress</p>
-            </div>
-            <div className="stat-card">
-              <p className="stat-label">most common state</p>
-              <p className="stat-value" style={{ fontSize: '22px' }}>{mostCommonBucket}</p>
-              <p className="stat-sub">your usual</p>
-            </div>
-          </div>
 
-          {/* ── Section 2: Trend chart ── */}
-          <p className="progress-section-label">stress · calm · attention over time</p>
-          <div className="progress-chart-card">
-            <Line ref={chartRef} data={chartData} options={chartOptions} />
-          </div>
+            <div className="glass-card rounded-3xl p-8 flex flex-col justify-between min-h-[160px]">
+              <div>
+                <span className="material-symbols-outlined text-tertiary text-2xl mb-4">calendar_today</span>
+                <h4 className="font-meta-technical text-[10px] text-outline uppercase tracking-widest">BEST DAY</h4>
+              </div>
+              <div>
+                <p className="font-meta-technical text-meta-technical text-tertiary mt-2 uppercase">{bestDay}</p>
+                <span className="font-meta-technical text-[9px] text-outline">LOWEST STRESS</span>
+              </div>
+            </div>
 
-          {/* ── Section 3: Weekly mini bars ── */}
-          <p className="progress-section-label">this week</p>
-          <div className="progress-week-grid">
-            {weekDays.map((day, i) => {
-              const daySessions = sessions.filter(s => sameCalendarDay(new Date(s.createdAt), day));
-              const isToday = sameCalendarDay(day, today);
-              const avgDayStress = daySessions.length
-                ? Math.round(daySessions.reduce((a,s) => a + s.stress, 0) / daySessions.length)
-                : null;
-              const barHeight = avgDayStress !== null ? Math.max(4, (avgDayStress / 100) * 48) : 0;
-              return (
-                <div
-                  key={i}
-                  className="week-day-card"
-                  style={isToday ? { borderColor: 'rgba(127,255,60,0.35)', background: 'rgba(127,255,60,0.04)' } : {}}
-                >
-                  <p className="week-day-label">{DAY_LABELS[i]}</p>
-                  {avgDayStress === null ? (
-                    <span className="week-day-empty">—</span>
-                  ) : (
-                    <>
-                      <div className="week-bar-wrap">
-                        <div
-                          className="week-bar"
-                          style={{
-                            height: `${barHeight}px`,
-                            background: stressBarColor(avgDayStress),
-                          }}
-                        />
-                      </div>
-                      <p className="week-day-value">{avgDayStress}</p>
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+            <div className="glass-card rounded-3xl p-8 flex flex-col justify-between min-h-[160px]">
+              <div>
+                <span className="material-symbols-outlined text-secondary text-2xl mb-4" style={{ fontVariationSettings: "'FILL' 1" }}>spa</span>
+                <h4 className="font-meta-technical text-[10px] text-outline uppercase tracking-widest">TYPICAL STATE</h4>
+              </div>
+              <div>
+                <p className="font-meta-technical text-meta-technical text-secondary mt-2 uppercase">{mostCommonBucket}</p>
+                <span className="font-meta-technical text-[9px] text-outline">DOMINANT COGNITIVE STATE</span>
+              </div>
+            </div>
+          </section>
 
-          {/* ── Section 4: Session history ── */}
-          <p className="progress-section-label">check-in history</p>
-          <div className="progress-history">
-            {sessions.map(s => (
-              <div key={s._id} className="history-card">
-                <div className="history-left">
-                  <div className="history-top-row">
-                    <span className="history-time">{fmtDateTime(s.createdAt)}</span>
-                    <span className="bucket-badge" style={bucketBadgeStyle(s.bucket)}>
-                      {s.bucket}
+          {/* Section 2: Trend Chart */}
+          <section className="space-y-4">
+            <h3 className="font-meta-technical text-[11px] text-outline uppercase tracking-widest flex items-center gap-2">
+              <span className="w-6 h-[1px] bg-outline"></span> COGNITIVE INDEX OVER TIME
+            </h3>
+            <div className="glass-card rounded-3xl p-6 md:p-8 h-[400px]">
+              <Line ref={chartRef} data={chartData} options={chartOptions} />
+            </div>
+          </section>
+
+          {/* Section 3: Weekly Progress Bar Columns */}
+          <section className="space-y-4">
+            <h3 className="font-meta-technical text-[11px] text-outline uppercase tracking-widest flex items-center gap-2">
+              <span className="w-6 h-[1px] bg-outline"></span> WEEKLY RHYTHM
+            </h3>
+            <div className="grid grid-cols-7 gap-4">
+              {weekDays.map((day, i) => {
+                const daySessions = sessions.filter(s => sameCalendarDay(new Date(s.createdAt), day));
+                const isToday = sameCalendarDay(day, today);
+                const avgDayStress = daySessions.length
+                  ? Math.round(daySessions.reduce((a,s) => a + s.stress, 0) / daySessions.length)
+                  : null;
+                const barHeight = avgDayStress !== null ? Math.max(8, (avgDayStress / 100) * 120) : 0;
+                
+                return (
+                  <div
+                    key={i}
+                    className={`glass-card rounded-2xl p-4 flex flex-col items-center justify-between min-h-[220px] transition-all duration-300 ${
+                      isToday ? 'border-secondary/40 bg-secondary/5' : 'border-outline-variant/30'
+                    }`}
+                  >
+                    <span className="font-meta-technical text-[11px] text-outline uppercase">{DAY_LABELS[i]}</span>
+                    
+                    <div className="flex-grow flex items-end justify-center w-full my-4">
+                      {avgDayStress === null ? (
+                        <span className="font-meta-technical text-[10px] text-outline/30">—</span>
+                      ) : (
+                        <div className="w-2 rounded-full relative" style={{ height: '120px', background: 'rgba(255,255,255,0.03)' }}>
+                          <div
+                            className="w-full rounded-full absolute bottom-0 transition-all duration-700"
+                            style={{
+                              height: `${barHeight}px`,
+                              background: stressBarColor(avgDayStress),
+                              boxShadow: `0 0 10px ${stressBarColor(avgDayStress)}40`
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    
+                    <span className="font-meta-technical text-[11px] font-semibold text-on-surface">
+                      {avgDayStress !== null ? `${avgDayStress}%` : '—'}
                     </span>
                   </div>
-                  <p className="history-mood-text">{s.moodText}</p>
-                  <p className="history-recs">
-                    {s.recommendations?.tv?.title && `📺 ${s.recommendations.tv.title}`}
-                    {s.recommendations?.music?.title && `  🎵 ${s.recommendations.music.title}`}
-                    {s.recommendations?.movie?.title && `  🎬 ${s.recommendations.movie.title}`}
-                  </p>
-                </div>
-                <div className="history-right">
-                  {[
-                    { label: 'stress',    value: s.stress },
-                    { label: 'calm',      value: s.calm },
-                    { label: 'attention', value: s.attention },
-                  ].map(m => (
-                    <div key={m.label} className="history-metric">
-                      <span className="history-metric-label">{m.label}</span>
-                      <span className="history-metric-value">{m.value}</span>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Section 4: Session History */}
+          <section className="space-y-6">
+            <div className="flex justify-between items-end border-b border-outline-variant/30 pb-4">
+              <h3 className="font-meta-technical text-[11px] text-outline uppercase tracking-widest flex items-center gap-2">
+                <span className="w-6 h-[1px] bg-outline"></span> SESSION LOG HISTORY
+              </h3>
+              <span className="font-meta-technical text-[10px] text-outline">{sessions.length} snaps saved</span>
+            </div>
+            
+            <div className="space-y-4">
+              {sessions.map(s => (
+                <div 
+                  key={s._id} 
+                  className="glass-card rounded-[20px] p-6 hover:bg-surface-container-low/60 transition-all duration-300 flex flex-col md:flex-row justify-between gap-6"
+                >
+                  <div className="flex-grow space-y-4">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="font-meta-technical text-[12px] text-outline">{fmtDateTime(s.createdAt)}</span>
+                      <span className={`px-3 py-1 rounded-full font-meta-technical text-[9px] uppercase tracking-wider ${bucketBadgeStyleClass(s.bucket)}`}>
+                        {s.bucket}
+                      </span>
                     </div>
-                  ))}
+                    {s.moodText && (
+                      <p className="font-headline-sm text-[18px] text-on-surface italic font-light">
+                        "{s.moodText}"
+                      </p>
+                    )}
+                    <div className="flex items-center gap-6 text-[13px] text-on-surface-variant font-meta-technical">
+                      {s.recommendations?.movie?.title && (
+                        <span className="flex items-center gap-1.5"><span className="text-secondary">🎬</span> {s.recommendations.movie.title}</span>
+                      )}
+                      {s.recommendations?.tv?.title && (
+                        <span className="flex items-center gap-1.5"><span className="text-tertiary">📺</span> {s.recommendations.tv.title}</span>
+                      )}
+                      {s.recommendations?.music?.title && (
+                        <span className="flex items-center gap-1.5"><span>🎵</span> {s.recommendations.music.title}</span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex md:flex-col justify-between md:justify-center md:items-end gap-4 border-t md:border-t-0 md:border-l border-outline-variant/30 pt-4 md:pt-0 md:pl-8 min-w-[120px]">
+                    {[
+                      { label: 'stress',    value: s.stress, color: 'text-error' },
+                      { label: 'calm',      value: s.calm, color: 'text-tertiary' },
+                      { label: 'attention', value: s.attention, color: 'text-secondary' },
+                    ].map(m => (
+                      <div key={m.label} className="flex md:flex-row flex-col md:items-center justify-between md:w-full gap-2">
+                        <span className="font-meta-technical text-[9px] text-outline uppercase tracking-wider">{m.label}</span>
+                        <span className={`font-meta-technical text-[13px] font-bold ${m.color}`}>{m.value}%</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </>
+              ))}
+            </div>
+          </section>
+
+        </div>
       )}
     </div>
   );

@@ -1,0 +1,315 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>About Drift | Reclaiming Your Attention</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-tint": "#c3c6d7",
+                    "tertiary": "#cdbff0",
+                    "surface-container": "#1d2021",
+                    "tertiary-fixed": "#e8ddff",
+                    "secondary": "#85d5cd",
+                    "primary-fixed": "#dfe2f3",
+                    "primary": "#c3c6d7",
+                    "on-surface-variant": "#c7c6cc",
+                    "surface": "#111415",
+                    "surface-container-high": "#282a2b",
+                    "surface-container-highest": "#323536",
+                    "on-background": "#e1e3e4",
+                    "outline": "#909096",
+                    "on-secondary-fixed": "#00201e",
+                    "on-primary": "#2c303d",
+                    "secondary-fixed-dim": "#85d5cd",
+                    "error-container": "#93000a",
+                    "on-tertiary": "#342a51",
+                    "on-secondary-container": "#93e3db",
+                    "on-primary-fixed-variant": "#434654",
+                    "on-primary-container": "#777b8a",
+                    "tertiary-fixed-dim": "#cdbff0",
+                    "surface-container-lowest": "#0c0f10",
+                    "surface-variant": "#323536",
+                    "secondary-fixed": "#a0f1e9",
+                    "outline-variant": "#46464c",
+                    "surface-bright": "#373a3b",
+                    "secondary-container": "#006761",
+                    "inverse-surface": "#e1e3e4",
+                    "on-primary-fixed": "#171b28",
+                    "tertiary-container": "#11062d",
+                    "surface-container-low": "#191c1d",
+                    "on-tertiary-fixed-variant": "#4b4169",
+                    "on-surface": "#e1e3e4",
+                    "inverse-on-surface": "#2e3132",
+                    "inverse-primary": "#5a5e6d",
+                    "on-tertiary-fixed": "#1f153b",
+                    "background": "#111415",
+                    "on-error": "#690005",
+                    "primary-fixed-dim": "#c3c6d7",
+                    "on-secondary-fixed-variant": "#00504b",
+                    "on-secondary": "#003734",
+                    "primary-container": "#0a0e1a",
+                    "surface-dim": "#111415",
+                    "on-error-container": "#ffdad6",
+                    "on-tertiary-container": "#8075a1",
+                    "error": "#ffb4ab"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "8px",
+                    "margin-mobile": "20px",
+                    "container-max": "1200px",
+                    "margin-desktop": "64px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "label-caps": ["Inter"],
+                    "display-lg": ["Playfair Display"],
+                    "headline-sm": ["Playfair Display"],
+                    "headline-md": ["Playfair Display"],
+                    "display-lg-mobile": ["Playfair Display"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                    "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "display-lg-mobile": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0A0E1A; /* Deep indigo base */
+            scroll-behavior: smooth;
+        }
+        .glass-card {
+            background: rgba(17, 20, 21, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .aura-shadow-teal {
+            box-shadow: 0 0 80px -20px rgba(133, 213, 205, 0.15);
+        }
+        .aura-shadow-lavender {
+            box-shadow: 0 0 80px -20px rgba(205, 191, 240, 0.15);
+        }
+        .ease-cinematic {
+            transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-background selection:bg-secondary/30">
+<!-- TopAppBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/40 backdrop-blur-xl border-b border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
+<div class="flex justify-between items-center px-margin-desktop h-20 max-w-container-max mx-auto">
+<div class="font-display-lg text-headline-md tracking-tighter text-primary">Drift</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="font-body-md text-body-md tracking-tight text-on-surface-variant hover:text-primary transition-colors" href="#">Home</a>
+<a class="font-body-md text-body-md tracking-tight text-on-surface-variant hover:text-primary transition-colors" href="#">Progress</a>
+<a class="font-body-md text-body-md tracking-tight text-secondary border-b-2 border-secondary pb-1" href="#">About</a>
+<a class="font-body-md text-body-md tracking-tight text-on-surface-variant hover:text-primary transition-colors" href="#">Profile</a>
+<button class="material-symbols-outlined text-primary hover:bg-white/5 p-2 rounded-full transition-all">notifications</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" data-alt="A sophisticated close-up portrait of a modern professional in soft, low-key lighting. The background is a dark, cinematic indigo that matches the app's aesthetic. The lighting highlights high cheekbones and a serene expression, reflecting the calm and wellness focus of the Drift brand. The overall style is clean, editorial, and high-contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8YgzKJD_Nn1MmzDQp-6GxUEFN-B6iNJZTh-ztWjiXD644hu5ylx6CQakYs5pNF6u6FRf86eg55---rTq2SXu7pCqtZj9KQ0Pz649vEi6RenYoaHmWxMK7HRV7Vn1BehBmtO0KNDPLsSWqGvncHwG7Jv2rNmrM1b4P4lx2KBRjexEBgxTc9XDLSX8kNjd8P2O3t3x95YFOPehGCuAHuoTVKAuwpLmitwJTadOZJcEKCeN95MlP2yVdFkEgDn8HxlZwQ56PemwtCi0A">
+</div>
+</div>
+<!-- Mobile Menu Icon -->
+<button class="md:hidden material-symbols-outlined text-on-surface">menu</button>
+</div>
+</nav>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="relative min-h-[819px] flex items-center justify-center overflow-hidden px-margin-mobile md:px-margin-desktop">
+<div class="absolute inset-0 z-0">
+
+</div>
+<div class="relative z-10 text-center max-w-4xl mx-auto space-y-8">
+<span class="font-label-caps text-label-caps text-secondary tracking-[0.2em] block transform transition-all duration-1000 translate-y-0 opacity-100">OUR PHILOSOPHY</span>
+<h1 class="font-display-lg text-display-lg-mobile md:text-display-lg text-primary leading-none">
+                    The Drift Philosophy: <br>
+<span class="italic text-on-surface-variant font-medium">Reclaiming Your Attention.</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
+                    In an age of infinite scrolling, choice is no longer a luxury—it’s a burden. Drift is a quiet curator designed to align your digital consumption with your internal rhythm.
+                </p>
+<div class="pt-8">
+<button class="group relative px-12 py-4 rounded-full overflow-hidden transition-all duration-500 hover:scale-105 active:scale-95 aura-shadow-teal">
+<div class="absolute inset-0 bg-gradient-to-r from-secondary to-tertiary"></div>
+<span class="relative font-label-caps text-label-caps text-on-secondary-fixed flex items-center gap-2">
+                            BEGIN YOUR DRIFT <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Editorial Content Section -->
+<section class="py-24 md:py-48 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
+<div class="md:col-span-5 space-y-12">
+<h2 class="font-display-lg text-headline-md md:text-display-lg text-primary leading-tight">
+                        Beyond the <br>Algorithmic <br>Void.
+                    </h2>
+<div class="space-y-6 text-on-surface-variant font-body-lg">
+<p>
+                            We spend hours hunting for the perfect film, the right podcast, or a song that matches our mood. By the time we find it, our window for relaxation has often closed. This is "Choice Paralysis," and it's draining our most valuable resource: attention.
+                        </p>
+<p>
+                            Drift was born from a simple observation: your capacity for focus isn't constant. Some days you are wired and hungry for complexity. Other days, you are settling, looking for warmth. Often, you are simply draining, needing the digital equivalent of a deep breath.
+                        </p>
+</div>
+</div>
+<div class="md:col-span-6 md:col-start-8">
+<div class="relative rounded-3xl overflow-hidden glass-card aura-shadow-lavender transform rotate-2 hover:rotate-0 transition-transform duration-700 ease-cinematic">
+<img class="w-full aspect-[4/5] object-cover" data-alt="A minimalist cinematic photograph of a single ripples in a deep indigo pool of water. Soft teal and lavender light catches the edges of the water, creating a serene and meditative mood. The composition is clean with significant dark space, embodying the luxury and calmness of a premium wellness brand. High-end editorial style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvWJgPrDAUC4_Sai9woQ3fhxcaGjjTk412DeLSnzMknRWeT8R5mak9bNMAS7Gfu6u5vWn_XUm_3_nzbODjDBQQ7vCd0tCUEX0Urzz_hxv893QnSnWO7JN51qwWIkzCN6srWSapyvhDvWoFWOAwNgOJgXuSyEEgBBvcwntW6Z0RVTAwvmZM6fLDGwRuRWjGPKAxyWAz4nZOq-UJ2YisHaEvX_J6W7uR376AQUnvEDjfYKinS4rknT171GKJZ5lt0FzX8480QSBBoIdc">
+</div>
+</div>
+</div>
+</section>
+<!-- How It Works / Attention States -->
+<section class="py-24 bg-surface-container-lowest/50">
+<div class="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto space-y-16">
+<div class="text-center space-y-4">
+<h2 class="font-display-lg text-headline-md md:text-headline-md text-primary">How Drift Works</h2>
+<p class="text-on-surface-variant max-w-xl mx-auto font-body-md">We map content to your biological capacity for focus, categorizing the world into three distinct attention states.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+<!-- State: Draining -->
+<div class="glass-card p-12 rounded-[2rem] text-center space-y-6 hover:translate-y-[-8px] transition-all duration-500 ease-cinematic group">
+<div class="w-20 h-20 mx-auto rounded-full bg-primary-container flex items-center justify-center text-secondary mb-4 group-hover:scale-110 transition-transform duration-500">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">battery_low</span>
+</div>
+<h3 class="font-display-lg text-headline-sm text-primary">Draining</h3>
+<p class="text-on-surface-variant font-body-md leading-relaxed">
+                            For when your tank is empty. We provide low-friction, atmospheric content—ambient sounds, slow cinema, and minimalist art to help you recharge without effort.
+                        </p>
+<div class="h-1 w-12 bg-secondary/30 mx-auto rounded-full"></div>
+</div>
+<!-- State: Settling -->
+<div class="glass-card p-12 rounded-[2rem] text-center space-y-6 hover:translate-y-[-8px] transition-all duration-500 ease-cinematic group border-secondary/20 aura-shadow-teal">
+<div class="w-20 h-20 mx-auto rounded-full bg-secondary-container flex items-center justify-center text-secondary mb-4 group-hover:scale-110 transition-transform duration-500">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">waves</span>
+</div>
+<h3 class="font-display-lg text-headline-sm text-primary">Settling</h3>
+<p class="text-on-surface-variant font-body-md leading-relaxed">
+                            The transition state. Engaging narratives and rhythmic melodies that guide your focus away from the day's noise and into a state of flow.
+                        </p>
+<div class="h-1 w-12 bg-secondary/30 mx-auto rounded-full"></div>
+</div>
+<!-- State: Wired -->
+<div class="glass-card p-12 rounded-[2rem] text-center space-y-6 hover:translate-y-[-8px] transition-all duration-500 ease-cinematic group">
+<div class="w-20 h-20 mx-auto rounded-full bg-primary-container flex items-center justify-center text-tertiary mb-4 group-hover:scale-110 transition-transform duration-500">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<h3 class="font-display-lg text-headline-sm text-primary">Wired</h3>
+<p class="text-on-surface-variant font-body-md leading-relaxed">
+                            For peak cognitive performance. Complex documentaries, intricate soundscapes, and challenging essays for when your mind is ready to explore.
+                        </p>
+<div class="h-1 w-12 bg-tertiary/30 mx-auto rounded-full"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bento Grid Vision -->
+<section class="py-24 md:py-48 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-gutter h-auto md:h-[600px]">
+<div class="md:col-span-2 md:row-span-2 glass-card rounded-3xl p-12 flex flex-col justify-end space-y-4 group overflow-hidden relative">
+<img class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:scale-110 transition-transform duration-1000 ease-cinematic" data-alt="A dark, moody editorial photo of a pair of high-end over-ear headphones resting on a marble surface. The lighting is dramatic, with soft lavender highlights illuminating the textures of the leather and metal. The background is a deep indigo void, creating a sense of isolation and focus. Minimalist and luxurious." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqp9gl6js1KCQcKK5XhqwYaCUiOAEdvCQInSS3269gXW4q-sYfusENT9Qhi-rfe-0d5DQ7M1HXCbH4OI4FXhLRiPSDYBUIYTlYmiy6iUxBNeR4QTV35ABoC5HuAHZpTRIe5tYVfrc9bDS4LxgdcPihxQzAvuCZD1IaQ4MSF049x27ZEAaMTnp4u7JwQNRWmuiMyX2rpO7RYzTXICfEaqG_ZMVA_cKYtPmBxZdrbms7w8yApZOk-YXqZDzRHaRFw9c6FqyugJX-9oOh">
+<div class="relative z-10">
+<h4 class="font-display-lg text-headline-md text-primary">Sensory Curators</h4>
+<p class="text-on-surface-variant max-w-xs">Every piece of media is hand-selected by our team of psychologists and artists.</p>
+</div>
+</div>
+<div class="md:col-span-2 glass-card rounded-3xl p-12 flex items-center justify-between border-tertiary/10">
+<div class="space-y-2">
+<h4 class="font-display-lg text-headline-sm text-primary">85% Reduced Friction</h4>
+<p class="text-on-surface-variant">Our users spend more time consuming and less time searching.</p>
+</div>
+<span class="material-symbols-outlined text-5xl text-tertiary opacity-50">analytics</span>
+</div>
+<div class="md:col-span-1 glass-card rounded-3xl p-8 flex flex-col justify-center items-center text-center space-y-4">
+<span class="material-symbols-outlined text-4xl text-secondary">psychology</span>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Cognitive Science Led</p>
+</div>
+<div class="md:col-span-1 glass-card rounded-3xl p-8 flex flex-col justify-center items-center text-center space-y-4 bg-gradient-to-br from-surface-container to-primary-container">
+<span class="material-symbols-outlined text-4xl text-primary">visibility_off</span>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Zero Ad Intrusion</p>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="py-24 text-center px-margin-mobile md:px-margin-desktop">
+<div class="max-w-2xl mx-auto space-y-8">
+<h2 class="font-display-lg text-headline-md text-primary">Ready to settle in?</h2>
+<p class="text-on-surface-variant font-body-lg">Stop searching. Start drifting.</p>
+<div class="flex flex-col md:flex-row items-center justify-center gap-6">
+<button class="w-full md:w-auto px-12 py-4 rounded-full bg-primary text-on-primary font-label-caps text-label-caps transition-all hover:bg-white hover:text-black">GET THE APP</button>
+<button class="w-full md:w-auto px-12 py-4 rounded-full border border-outline-variant text-primary font-label-caps text-label-caps hover:bg-white/5 transition-all">VIEW FEATURES</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 bg-surface-container-lowest border-t border-white/5">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop space-y-4 md:space-y-0 max-w-container-max mx-auto">
+<div class="font-display-lg text-headline-sm text-primary">Drift</div>
+<div class="flex space-x-8 text-on-surface-variant font-label-caps text-label-caps">
+<a class="hover:text-secondary transition-opacity" href="#">Privacy Policy</a>
+<a class="hover:text-secondary transition-opacity" href="#">Terms of Service</a>
+<a class="hover:text-secondary transition-opacity" href="#">Cookie Settings</a>
+</div>
+<div class="text-on-surface-variant font-label-caps text-label-caps opacity-60">
+                © 2024 Drift. All rights reserved.
+            </div>
+</div>
+</footer>
+<script>
+        // Micro-interactions and parallax scroll effect
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('webgl-shader');
+            if (hero) {
+                hero.style.transform = `translateY(${scrolled * 0.4}px)`;
+            }
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.glass-card').forEach(el => {
+            el.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-1000', 'ease-cinematic');
+            observer.observe(el);
+        });
+    </script>
+</body></html>

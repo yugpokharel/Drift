@@ -38,6 +38,7 @@ export interface MoodInput {
 }
 
 export interface HybridRecommendation {
+  /** Internal item ID (MovieLens movieId mapped to a TV show) */
   movieId: number;
   title: string;
   overview: string;
@@ -49,10 +50,16 @@ export interface HybridRecommendation {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
+/**
+ * All TV show genres used in the feature vector (must match evaluate_hybrid_v2.py and generate_embeddings.ts).
+ * These are the MovieLens genre labels that were mapped to TV show content via the TMDB TV show cache.
+ */
 const ALL_GENRES = [
-  'Action', 'Adventure', 'Animation', 'Children', 'Comedy', 'Crime',
-  'Documentary', 'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical',
-  'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War', 'Western',
+  'Action & Adventure', 'Animation', 'Comedy', 'Crime', 'Documentary',
+  'Drama', 'Family', 'Kids', 'Mystery', 'Reality',
+  'Sci-Fi & Fantasy', 'Soap', 'War & Politics', 'Western',
+  // Legacy MovieLens genres (some still appear in mapped data)
+  'Action', 'Adventure', 'Thriller', 'Romance',
 ];
 const GENRE_TO_IDX = Object.fromEntries(ALL_GENRES.map((g, i) => [g, i]));
 
@@ -80,11 +87,37 @@ interface RecommenderAssets {
   movie_features: Record<string, MovieFeature>;
   candidates: Record<string, CandidateEntry[]>;
   popularity_fallback: CandidateEntry[];
+  user_to_idx: Record<string, number>;
+  movie_to_idx: Record<string, number>;
+  user_factors_path?: string;
+  item_factors_path?: string;
 }
 
 let assets: RecommenderAssets | null = null;
+let userFactors: Float32Array | null = null;
+let itemFactors: Float32Array | null = null;
 /** Pre-built combined feature vectors keyed by movieId */
 const movieVectors: Map<number, Float32Array> = new Map();
+
+function loadNpy(filePath: string): Float32Array {
+  const buf = fs.readFileSync(filePath);
+  const major = buf.readUInt8(6);
+  let headerLen = 0;
+  let dataOffset = 0;
+  if (major === 1) {
+    headerLen = buf.readUInt16LE(8);
+    dataOffset = 10 + headerLen;
+  } else if (major === 2) {
+    headerLen = buf.readUInt32LE(8);
+    dataOffset = 12 + headerLen;
+  } else {
+    throw new Error(`Unsupported Npy version: ${major}`);
+  }
+  const floatBuf = buf.subarray(dataOffset);
+  const arrayBuf = new ArrayBuffer(floatBuf.length);
+  new Uint8Array(arrayBuf).set(floatBuf);
+  return new Float32Array(arrayBuf);
+}
 
 function loadAssets() {
   if (assets) return;
@@ -115,6 +148,24 @@ function loadAssets() {
       `${Object.keys(assets.movie_features).length} movies, ` +
       `${Object.keys(assets.candidates).length} user candidate lists.`
     );
+
+    // Load ALS factors if available
+    if (assets.user_factors_path && assets.item_factors_path) {
+      const baseDir = path.dirname(assetPath);
+      const uPath = path.resolve(baseDir, path.basename(assets.user_factors_path));
+      const iPath = path.resolve(baseDir, path.basename(assets.item_factors_path));
+      if (fs.existsSync(uPath) && fs.existsSync(iPath)) {
+        try {
+          userFactors = loadNpy(uPath);
+          itemFactors = loadNpy(iPath);
+          console.log(`[Recommender] Loaded ALS factors: userFactors (${userFactors.length / 128}x128), itemFactors (${itemFactors.length / 128}x128)`);
+        } catch (factorErr: any) {
+          console.warn('[Recommender] Failed to parse ALS factors, using candidates fallback:', factorErr.message);
+        }
+      } else {
+        console.warn(`[Recommender] ALS factor files not found at ${uPath} or ${iPath}`);
+      }
+    }
 
     // Pre-build movie vectors: [genre_one_hot(18), runtime_norm(1), embedding(384)]
     for (const [midStr, feats] of Object.entries(assets.movie_features)) {
@@ -325,11 +376,11 @@ function buildExplanation(movie: MovieFeature, mood: MoodInput, alpha: number): 
     : 'medium';
 
   const genreStr = movie.genres.slice(0, 3).join(', ');
-  const runtimeNote = movie.runtime < 100
-    ? 'short runtime keeps things light'
-    : movie.runtime > 130
-      ? 'an immersive runtime for full engagement'
-      : 'a comfortable watch length';
+  const runtimeNote = movie.runtime < 30
+    ? 'bite-sized episodes for easy watching'
+    : movie.runtime > 55
+      ? 'longer episodes for deep immersion'
+      : 'standard episode length for a comfortable session';
 
   const toneNote = tone === 'comfort'
     ? 'matches your need for something warm and reassuring'
@@ -369,8 +420,37 @@ export async function getHybridRecommendation(
   // 2. Build mood query vector
   const queryVec = await buildQueryVector(mood);
 
-  // 3. Normalize CF scores to [0, 1]
-  const scores = candidateList.map(c => c.score);
+  // 3. Compute CF scores using factors if available, or fall back to candidate list precomputed scores
+  const cfScores = new Map<number, number>();
+  let hasFactors = false;
+  if (userFactors && itemFactors && userId !== undefined) {
+    const uIdx = assets.user_to_idx[String(userId)];
+    if (uIdx !== undefined) {
+      const uOffset = uIdx * 128;
+      const uVec = userFactors.subarray(uOffset, uOffset + 128);
+      hasFactors = true;
+      for (const c of candidateList) {
+        const mIdx = assets.movie_to_idx[String(c.movieId)];
+        if (mIdx !== undefined) {
+          const mOffset = mIdx * 128;
+          const mVec = itemFactors.subarray(mOffset, mOffset + 128);
+          let dot = 0;
+          for (let i = 0; i < 128; i++) dot += uVec[i] * mVec[i];
+          cfScores.set(c.movieId, dot);
+        } else {
+          cfScores.set(c.movieId, 0.0);
+        }
+      }
+    }
+  }
+
+  if (!hasFactors) {
+    for (const c of candidateList) {
+      cfScores.set(c.movieId, c.score);
+    }
+  }
+
+  const scores = Array.from(cfScores.values());
   const minS = Math.min(...scores);
   const maxS = Math.max(...scores);
   const range = maxS - minS || 1;
@@ -378,7 +458,8 @@ export async function getHybridRecommendation(
   // 4. Score each candidate
   const alpha = assets.alpha;
   const ranked: Array<{ mid: number; finalScore: number }> = candidateList.map(c => {
-    const cfNorm = (c.score - minS) / range;
+    const cfRawScore = cfScores.get(c.movieId) ?? 0.0;
+    const cfNorm = (cfRawScore - minS) / range;
     const movieVec = movieVectors.get(c.movieId);
     const moodSim = movieVec ? cosine(queryVec, movieVec) : 0;
     const finalScore = alpha * cfNorm + (1 - alpha) * moodSim;

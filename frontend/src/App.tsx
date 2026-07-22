@@ -865,13 +865,13 @@ export default function App() {
                           </div>
                           
                           <h1 className="font-display-lg text-display-lg-mobile md:text-display-lg text-primary leading-none tracking-tight">
-                            {recommendations.movie.title}
+                            {recommendations.tv_show.title}
                           </h1>
                           
                           <div className="flex items-center gap-3 font-meta-technical text-[11px] text-outline uppercase tracking-wider">
                             <span>PRIMARY TV SHOW</span>
                             <span className="w-1.5 h-1.5 bg-outline-variant rounded-full" />
-                            <span>{recommendations.movie.genres?.join(' / ') || 'TV Show'}</span>
+                            <span>{recommendations.tv_show.genres?.join(' / ') || 'TV Show'}</span>
                           </div>
                         </div>
 
@@ -879,11 +879,11 @@ export default function App() {
                         <div className="flex flex-wrap gap-4">
                           <div className="flex items-center gap-2 border border-outline-variant/40 bg-white/3 px-3.5 py-2 font-meta-technical text-[11px] group hover:border-white/20 transition-colors">
                             <span className="text-[10px] text-outline">IMDB</span>
-                            <span className="text-on-surface">[ {recommendations.movie.imdbRating || '7.8'} <span className="text-outline/50">/ 10</span> ]</span>
+                            <span className="text-on-surface">[ {recommendations.tv_show.imdbRating || '8.2'} <span className="text-outline/50">/ 10</span> ]</span>
                           </div>
                           <div className="flex items-center gap-2 border border-outline-variant/40 bg-white/3 px-3.5 py-2 font-meta-technical text-[11px] group hover:border-white/20 transition-colors">
                             <span className="text-[10px] text-outline">ROTTEN TOM.</span>
-                            <span className="text-secondary">[ {recommendations.movie.rottenTomatoes || '89% FRESH'} ]</span>
+                            <span className="text-secondary">[ {recommendations.tv_show.rottenTomatoes || '92% FRESH'} ]</span>
                           </div>
                           <div className="flex items-center gap-2 border border-outline-variant/40 bg-white/3 px-3.5 py-2 font-meta-technical text-[11px] group hover:border-white/20 transition-colors">
                             <span className="text-[10px] text-outline">COGNITIVE MATCH</span>
@@ -897,7 +897,7 @@ export default function App() {
                             <span className="w-5 h-[1.5px] bg-secondary" /> Why this pick
                           </h4>
                           <p className="font-headline-sm text-[18px] leading-relaxed italic text-on-surface-variant font-light">
-                            {recommendations.movie.whyThisPick || 
+                            {recommendations.tv_show.whyThisPick || 
                               `This was chosen because it demands comfortable attention and provides the intellectual and atmospheric tone that matches your ${getBucketName(userState.attentionCapacity)} state.`}
                           </p>
                         </div>
@@ -971,25 +971,25 @@ export default function App() {
 
                       {/* Secondary Bento Grid (8 columns) */}
                       <div className="md:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-8">
-                        {/* TV Show card */}
+                        {/* Movie card */}
                         <div className="glass-card rounded-[24px] p-8 border border-outline-variant/30 flex flex-col justify-between hover:border-white/20 transition-all duration-500 group min-h-[350px]">
                           <div>
                             <div className="flex justify-between items-start mb-6">
-                              <span className="font-meta-technical text-[10px] text-tertiary border border-tertiary/20 bg-tertiary/5 px-2 py-0.5 rounded uppercase">
-                                📺 TV SHOW
+                              <span className="font-meta-technical text-[10px] text-secondary border border-secondary/20 bg-secondary/5 px-2 py-0.5 rounded uppercase">
+                                🎥 MOVIE PICK
                               </span>
-                              <span className="material-symbols-outlined text-outline/40 group-hover:text-tertiary transition-colors">tv</span>
+                              <span className="material-symbols-outlined text-outline/40 group-hover:text-secondary transition-colors">movie</span>
                             </div>
-                            <h3 className="font-headline-md text-headline-sm text-primary mb-3 group-hover:text-tertiary transition-colors duration-300">
-                              {recommendations.tv_show.title}
+                            <h3 className="font-headline-md text-headline-sm text-primary mb-3 group-hover:text-secondary transition-colors duration-300">
+                              {recommendations.movie.title}
                             </h3>
                             <p className="text-on-surface-variant text-[14px] leading-relaxed line-clamp-4">
-                              {recommendations.tv_show.extraInfo}
+                              {recommendations.movie.whyThisPick || recommendations.movie.extraInfo}
                             </p>
                           </div>
 
                           <div className="flex items-center justify-between border-t border-outline-variant/20 pt-4 mt-6">
-                            <span className="font-meta-technical text-[10px] text-outline uppercase">Match: {getBucketName(userState.attentionCapacity)}</span>
+                            <span className="font-meta-technical text-[10px] text-outline uppercase">Match: {recommendations.movie.genres?.slice(0, 2).join(' / ') || 'Classic Movie'}</span>
                             <button className="text-[11px] font-meta-technical text-secondary hover:underline uppercase tracking-wider">Explore</button>
                           </div>
                         </div>

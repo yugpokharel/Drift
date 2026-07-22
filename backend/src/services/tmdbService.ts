@@ -125,9 +125,30 @@ async function fetchTopShow(genreIds: number[]): Promise<TMDBShow | null> {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
+const MOVIE_GENRES_MAP: Record<number, string> = {
+  28: 'Action', 12: 'Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime',
+  99: 'Documentary', 18: 'Drama', 10751: 'Family', 14: 'Fantasy',
+  10402: 'Music', 9648: 'Mystery', 10749: 'Romance', 878: 'Sci-Fi',
+  53: 'Thriller', 10752: 'War', 37: 'Western'
+};
+
+const TV_GENRES_MAP: Record<number, string> = {
+  10759: 'Action & Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime',
+  99: 'Documentary', 18: 'Drama', 10751: 'Family', 10762: 'Kids',
+  9648: 'Mystery', 10765: 'Sci-Fi & Fantasy', 10766: 'Soap',
+  10768: 'War & Politics', 37: 'Western'
+};
+
+export interface RichTMDBMedia {
+  title: string;
+  extraInfo: string;
+  voteAverage: number;
+  genres: string[];
+}
+
 export async function fetchTMDBRecommendations(state: UserState): Promise<{
-  movie: { title: string; extraInfo: string } | null;
-  tv_show: { title: string; extraInfo: string } | null;
+  movie: RichTMDBMedia | null;
+  tv_show: RichTMDBMedia | null;
 }> {
   const [movie, tvShow] = await Promise.all([
     fetchTopMovies(movieGenresForState(state)),
@@ -136,10 +157,20 @@ export async function fetchTMDBRecommendations(state: UserState): Promise<{
 
   return {
     movie: movie
-      ? { title: movie.title, extraInfo: movie.overview.slice(0, 160) + (movie.overview.length > 160 ? '…' : '') }
+      ? {
+          title: movie.title,
+          extraInfo: movie.overview.slice(0, 160) + (movie.overview.length > 160 ? '…' : ''),
+          voteAverage: movie.vote_average,
+          genres: movie.genre_ids.map(id => MOVIE_GENRES_MAP[id]).filter(Boolean)
+        }
       : null,
     tv_show: tvShow
-      ? { title: tvShow.name, extraInfo: tvShow.overview.slice(0, 160) + (tvShow.overview.length > 160 ? '…' : '') }
+      ? {
+          title: tvShow.name,
+          extraInfo: tvShow.overview, // Keep full overview for primary banner
+          voteAverage: tvShow.vote_average,
+          genres: tvShow.genre_ids.map(id => TV_GENRES_MAP[id]).filter(Boolean)
+        }
       : null
   };
 }
